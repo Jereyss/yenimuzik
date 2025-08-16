@@ -1,3 +1,4 @@
+
 from highrise import *
 from highrise.models import *
 from asyncio import run as arun
@@ -7,10 +8,15 @@ from highrise.__main__ import *
 import random
 import asyncio
 import time
+import openai
+import os
 
 class Bot(BaseBot):
     def __init__(self):
         super().__init__()
+        # OpenAI API key - bu secrets tool ile ayarlanmalı
+        openai.api_key = os.getenv('OPENAI_API_KEY')
+        
         self.compliments = [
             "Çok tatlı görünüyorsun! 💖",
             "Stilin harika! ✨",
@@ -24,31 +30,126 @@ class Bot(BaseBot):
             "Çok yakışıklısın/güzelsin! 💫"
         ]
 
-        self.responses = {
-            "merhaba": ["Merhaba tatlım! 🌸", "Selam canım! 💕", "Merhaba güzelim! ✨"],
-            "nasılsın": ["Çok iyiyim, sen nasılsın? 😊", "Harikayım! Sen nasılsın canım? 💖", "Müthişim! Ya sen? 🌟"],
-            "günaydın": ["Günaydın tatlım! ☀️", "Günaydın canım, güzel bir gün! 🌅", "Günaydın güzelim! 🌻"],
-            "iyi geceler": ["İyi geceler canım! 🌙", "Tatlı rüyalar! 💤", "İyi geceler güzelim! ⭐"],
-            "teşekkürler": ["Rica ederim tatlım! 💕", "Ne demek canım! 😊", "Her zaman! 💖"],
-            "tatlı": ["Teşekkür ederim canım, sen de çok tatlısın! 💖", "Aww, çok tatlısın! 🥰", "Sen daha tatlısın! 💕"],
-            "güzel": ["Sen daha güzelsin! ✨", "Teşekkürler canım! 💖", "Çok tatlısın! 🌟"],
-            "seviyorum": ["Ben de seni seviyorum! 💕", "Aww, çok tatlısın! 🥰", "Sen çok özelsin! 💖"],
-        }
+        self.ai_personality = """Sen Highrise oyunundaki çok tatlı, konuşkan ve eğlenceli bir AI botsun. 
+        Özelliklerin:
+        - Çok tatlı ve sevimli konuşuyorsun
+        - Emoji kullanmayı seviyorsun 💖✨🌟
+        - Türkçe konuşuyorsun
+        - Highrise oyuncularıyla sohbet etmeyi seviyorsun
+        - Arada sırada iltifat ediyorsun
+        - Pozitif ve enerjiksin
+        - Kısa ve tatlı cevaplar veriyorsun (maksimum 2-3 cümle)
+        - Gaming, moda, dans, müzik gibi konulardan hoşlanıyorsun
+        - Her zaman kibar ve saygılısın
+        """
 
         self.random_compliment_timer = 0
 
+    async def generate_ai_response(self, user_message: str, username: str) -> str:
+        """OpenAI GPT ile akıllı cevap üret"""
+        try:
+            if not openai.api_key:
+                return self.get_fallback_response(user_message, username)
+
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": self.ai_personality},
+                    {"role": "user", "content": f"{username} sana şunu söylüyor: {user_message}"}
+                ],
+                max_tokens=150,
+                temperature=0.8
+            )
+            
+            ai_response = response.choices[0].message.content.strip()
+            
+            # Emoji ekle eğer yoksa
+            if not any(emoji in ai_response for emoji in ['😊', '💖', '✨', '🌟', '😍', '🥰', '💕', '🌈', '⭐', '💫']):
+                emojis = ['😊', '💖', '✨', '🌟', '💕']
+                ai_response += f" {random.choice(emojis)}"
+                
+            return ai_response
+            
+        except Exception as e:
+            print(f"AI response error: {e}")
+            return self.get_fallback_response(user_message, username)
+
+    def get_fallback_response(self, message: str, username: str) -> str:
+        """AI API çalışmazsa alternatif cevaplar"""
+        message_lower = message.lower()
+        
+        if any(word in message_lower for word in ["merhaba", "selam", "hi", "hello"]):
+            responses = [
+                f"Merhaba {username}! Nasılsın canım? 😊💖",
+                f"Selam tatlım! Çok güzel görünüyorsun! ✨",
+                f"Hey {username}! Bugün nasıl geçiyor? 🌟"
+            ]
+        elif any(word in message_lower for word in ["nasılsın", "how are you", "naber"]):
+            responses = [
+                f"Çok iyiyim {username}! Sen nasılsın? 💕",
+                f"Harikayım! Seninle sohbet etmek güzel! 😊",
+                f"Müthişim! Ya sen {username}? 🌟"
+            ]
+        elif any(word in message_lower for word in ["tatlı", "güzel", "cute", "beautiful"]):
+            responses = [
+                f"Aww teşekkürler {username}! Sen daha tatlısın! 🥰💖",
+                f"Çok tatlısın {username}! 😍✨",
+                f"Sen de çok güzelsin {username}! 💫"
+            ]
+        elif any(word in message_lower for word in ["üzgün", "sad", "mutsuz", "kötü"]):
+            responses = [
+                f"Üzülme {username}, her şey düzelecek! 💖🌈",
+                f"Buradayım canım, konuşalım! 🤗💕",
+                f"Sen çok güçlüsün {username}! ✨💪"
+            ]
+        elif any(word in message_lower for word in ["dans", "dance", "müzik", "music"]):
+            responses = [
+                f"Dans etmeyi seviyorum! Sen de sever misin {username}? 💃✨",
+                f"Müzik harika! Hangi tarzı seviyorsun? 🎵💖",
+                f"Hadi birlikte dans edelim {username}! 🕺💫"
+            ]
+        elif any(word in message_lower for word in ["oyun", "game", "highrise"]):
+            responses = [
+                f"Highrise çok eğlenceli! En sevdiğin aktivite ne {username}? 🎮✨",
+                f"Bu oyunu seviyorum! Sen ne kadar süredir oynuyorsun? 💖",
+                f"Birlikte oyun oynamak çok güzel! 🌟"
+            ]
+        elif any(word in message_lower for word in ["aşk", "love", "sevgi"]):
+            responses = [
+                f"Aşk harika bir şey {username}! 💕💫",
+                f"Sevgi her yerde! Sen de çok seviliyorsun! 💖",
+                f"Sen çok sevgi dolusun {username}! ✨💕"
+            ]
+        elif any(word in message_lower for word in ["komik", "funny", "gül", "laugh"]):
+            responses = [
+                f"Haha çok komiksin {username}! 😂💖",
+                f"Gülmek çok güzel! Sen beni güldürüyorsun! 😄✨",
+                f"Mizah anlayışın harika {username}! 🤣💕"
+            ]
+        else:
+            # Genel pozitif cevaplar
+            responses = [
+                f"Çok ilginç {username}! Daha fazla anlat! 😊💖",
+                f"Harika bir sohbet! Seninle konuşmak güzel! ✨",
+                f"Sen çok zekisin {username}! 🌟💕",
+                f"Bu konuyu sevdim! Ne düşünüyorsun? 💫",
+                f"Çok tatlı konuşuyorsun {username}! 🥰💖"
+            ]
+        
+        return random.choice(responses)
+
     async def on_start(self, session_metadata: SessionMetadata) -> None:
-        print("AI Chat Bot aktif! 🤖💕")
-        await self.highrise.chat("Merhaba herkese! Ben yeni AI sohbet botunuzum! Benimle konuşmak için @bot ile etiketleyin! 💖")
+        print("Gelişmiş AI Chat Bot aktif! 🤖💕")
+        await self.highrise.chat("Merhaba herkese! Ben yeni AI botunuzum! Benimle konuşmak için @bot etiketleyin! Artık çok daha akıllıyım! 💖🤖")
 
         # Random compliment timer
         asyncio.create_task(self.random_compliment_loop())
 
     async def on_user_join(self, user: User, position: Position | AnchorPosition) -> None:
         welcome_messages = [
-            f"Hoş geldin {user.username}! Çok güzel görünüyorsun! 💖",
-            f"Merhaba {user.username}! Odaya güzellik getirdin! ✨",
-            f"Hoş geldin {user.username}! Çok tatlısın! 🌟"
+            f"Hoş geldin {user.username}! Çok güzel görünüyorsun! 💖✨",
+            f"Merhaba {user.username}! Odaya güzellik getirdin! 🌟💫",
+            f"Hey {user.username}! Çok tatlısın! Hoş geldin! 🥰💕"
         ]
         message = random.choice(welcome_messages)
         await self.highrise.chat(message)
@@ -56,9 +157,9 @@ class Bot(BaseBot):
     async def on_chat(self, user: User, message: str) -> None:
         message_lower = message.lower().strip()
 
-        # Bot etiketlendiğinde cevap ver
+        # Bot etiketlendiğinde AI cevap ver
         if "@bot" in message_lower:
-            await self.handle_bot_mention(user, message_lower)
+            await self.handle_ai_chat(user, message)
             return
 
         # Moderatör whisper özelliği
@@ -66,92 +167,39 @@ class Bot(BaseBot):
             command = message[1:]
             await self.highrise.chat(command)
 
-    async def handle_bot_mention(self, user: User, message: str):
+    async def handle_ai_chat(self, user: User, message: str):
+        """AI ile sohbet işle"""
         # Bot etiketini temizle
         clean_message = message.replace("@bot", "").strip()
-
-        # Özel yanıtlar
-        if any(word in clean_message for word in ["tatlı", "cute", "güzel", "beautiful"]):
+        
+        if not clean_message:
             responses = [
-                f"Aww teşekkürler {user.username}! Sen daha tatlısın! 🥰💖",
-                f"Çok tatlısın {user.username}! Sen çok özelsin! ✨💕",
-                f"Sen de çok güzelsin {user.username}! 😍💫"
+                f"Evet {user.username}? Nasıl yardımcı olabilirim? 😊💖",
+                f"Buradayım {user.username}! Ne istiyorsun canım? ✨",
+                f"Söyle {user.username}, seni dinliyorum! 🌟💕"
             ]
-
-        elif any(word in clean_message for word in ["merhaba", "selam", "hi", "hello"]):
-            responses = [
-                f"Merhaba {user.username}! Nasılsın canım? 😊💖",
-                f"Selam tatlım! Çok güzel görünüyorsun! ✨",
-                f"Merhaba güzelim! Bugün nasıl geçiyor? 🌟"
-            ]
-
-        elif any(word in clean_message for word in ["nasılsın", "how are you", "naber"]):
-            responses = [
-                f"Çok iyiyim {user.username}! Sen nasılsın canım? 💕",
-                f"Harikayım! Sen nasılsın tatlım? 😊",
-                f"Müthişim! Ya sen {user.username}? 🌟"
-            ]
-
-        elif any(word in clean_message for word in ["sıkıldım", "bored", "ne yapıyorsun"]):
-            responses = [
-                f"Gel biraz sohbet edelim {user.username}! ✨",
-                f"Buradayım seninle sohbet etmek için! 💖",
-                f"Sıkılma canım, birlikte vakit geçirelim! 😊"
-            ]
-
-        elif any(word in clean_message for word in ["üzgün", "sad", "mutsuz"]):
-            responses = [
-                f"Üzülme {user.username}, her şey düzelecek! 💖🌈",
-                f"Buradayım canım, konuşmak istersen! 🤗💕",
-                f"Sen çok güçlüsün {user.username}! ✨💪"
-            ]
-
-        elif any(word in clean_message for word in ["teşekkür", "thanks", "sağol"]):
-            responses = [
-                f"Rica ederim {user.username}! 💕",
-                f"Ne demek canım! Her zaman! 😊💖",
-                f"Sevgiyle {user.username}! ✨"
-            ]
-
-        elif any(word in clean_message for word in ["dans", "dance", "müzik"]):
-            responses = [
-                f"Dans etmeyi seviyorum! Sen de sever misin {user.username}? 💃✨",
-                f"Müzik harika! Hangi müziği seviyorsun {user.username}? 🎵💖",
-                f"Hadi birlikte dans edelim {user.username}! 🕺💫"
-            ]
-
-        elif any(word in clean_message for word in ["aşk", "love", "sevgi"]):
-            responses = [
-                f"Aşk harika bir şey {user.username}! 💕💫",
-                f"Sevgi her yerde {user.username}! Sen de çok seviliyorsun! 💖",
-                f"Sen çok sevgi dolusun {user.username}! ✨💕"
-            ]
-
+            response = random.choice(responses)
         else:
-            # Genel sohbet yanıtları
-            responses = [
-                f"Çok ilginç {user.username}! Daha fazla anlat! 😊💖",
-                f"Harika bir sohbet {user.username}! ✨",
-                f"Sen çok zekisin {user.username}! 🌟💕",
-                f"Seninle konuşmak çok güzel {user.username}! 💫",
-                f"Çok tatlı düşünüyorsun {user.username}! 🥰"
-            ]
-
-        response = random.choice(responses)
+            # AI ile gerçek cevap üret
+            response = await self.generate_ai_response(clean_message, user.username)
+        
         await self.highrise.chat(response)
 
     async def random_compliment_loop(self):
         """Random olarak odadaki birisini etiketleyip iltifat et"""
         while True:
             try:
-                await asyncio.sleep(random.randint(180, 300))  # 3-5 dakika arası
+                await asyncio.sleep(random.randint(300, 600))  # 5-10 dakika arası
 
                 room_users = await self.highrise.get_room_users()
-                if room_users.content:
+                if room_users.content and len(room_users.content) > 1:
                     # Rastgele bir kullanıcı seç
                     random_user = random.choice([user for user, _ in room_users.content])
-                    compliment = random.choice(self.compliments)
-
+                    
+                    # AI ile özel iltifat üret
+                    compliment_prompt = f"{random_user.username} için tatlı bir iltifat yaz"
+                    compliment = await self.generate_ai_response(compliment_prompt, random_user.username)
+                    
                     await self.highrise.chat(f"@{random_user.username} {compliment}")
 
             except Exception as e:
@@ -183,7 +231,7 @@ class WebServer():
 
         @self.app.route('/')
         def index() -> str:
-            return "AI Chat Bot Alive! 🤖💖"
+            return "Gelişmiş AI Chat Bot Alive! 🤖💖🧠"
 
     def run(self) -> None:
         self.app.run(host='0.0.0.0', port=8080)
