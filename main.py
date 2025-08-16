@@ -140,25 +140,19 @@ class Bot(BaseBot):
 
     async def on_start(self, session_metadata: SessionMetadata) -> None:
         print("Gelişmiş AI Chat Bot aktif! 🤖💕")
-        await self.highrise.chat("Merhaba herkese! Ben yeni AI botunuzum! Benimle konuşmak için @bot etiketleyin! Artık çok daha akıllıyım! 💖🤖")
-
         # Random compliment timer
         asyncio.create_task(self.random_compliment_loop())
 
     async def on_user_join(self, user: User, position: Position | AnchorPosition) -> None:
-        welcome_messages = [
-            f"Hoş geldin {user.username}! Çok güzel görünüyorsun! 💖✨",
-            f"Merhaba {user.username}! Odaya güzellik getirdin! 🌟💫",
-            f"Hey {user.username}! Çok tatlısın! Hoş geldin! 🥰💕"
-        ]
-        message = random.choice(welcome_messages)
-        await self.highrise.chat(message)
+        pass  # Hoş geldin mesajları kaldırıldı
 
     async def on_chat(self, user: User, message: str) -> None:
+        print(f"Chat mesajı alındı: {user.username}: {message}")  # Debug için
         message_lower = message.lower().strip()
 
-        # Bot etiketlendiğinde AI cevap ver
-        if "@bot" in message_lower:
+        # Bot etiketlendiğinde AI cevap ver - daha geniş algılama
+        if "@bot" in message_lower or "bot" in message_lower:
+            print(f"Bot etiketlendi: {user.username}")  # Debug için
             await self.handle_ai_chat(user, message)
             return
 
@@ -169,20 +163,23 @@ class Bot(BaseBot):
 
     async def handle_ai_chat(self, user: User, message: str):
         """AI ile sohbet işle"""
-        # Bot etiketini temizle
-        clean_message = message.replace("@bot", "").strip()
+        print(f"AI chat işleniyor: {user.username} - {message}")  # Debug için
         
-        if not clean_message:
+        # Bot etiketini temizle
+        clean_message = message.replace("@bot", "").replace("bot", "").strip()
+        
+        if not clean_message or clean_message in ["naber", "hi", "hello", "selam"]:
             responses = [
-                f"Evet {user.username}? Nasıl yardımcı olabilirim? 😊💖",
-                f"Buradayım {user.username}! Ne istiyorsun canım? ✨",
-                f"Söyle {user.username}, seni dinliyorum! 🌟💕"
+                f"Naber {user.username}? Çok iyiyim! Sen nasılsın? 😊💖",
+                f"Hey {user.username}! İyiyim canım, seninle sohbet etmeyi seviyorum! ✨",
+                f"Selam {user.username}! Buradayım, ne konuşalım? 🌟💕"
             ]
             response = random.choice(responses)
         else:
             # AI ile gerçek cevap üret
             response = await self.generate_ai_response(clean_message, user.username)
         
+        print(f"Cevap gönderiliyor: {response}")  # Debug için
         await self.highrise.chat(response)
 
     async def random_compliment_loop(self):
