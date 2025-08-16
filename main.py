@@ -16,6 +16,7 @@ class Bot(BaseBot):
         super().__init__()
         # OpenAI client - bu secrets tool ile ayarlanmalı
         self.openai_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+        self.bot_username = None  # Bot'un kendi kullanıcı adını saklayacak
         
         self.compliments = [
             "Çok tatlı görünüyorsun! 💖",
@@ -49,7 +50,7 @@ class Bot(BaseBot):
         """OpenAI GPT ile akıllı cevap üret"""
         try:
             if not self.openai_client.api_key:
-                return f"Merhaba {username}! AI bağlantım şu an çalışmıyor, ama seninle konuşmak istiyorum! 💖"
+                return await self.get_fallback_response(user_message, username)
 
             response = self.openai_client.chat.completions.create(
                 model="gpt-3.5-turbo",
@@ -72,12 +73,61 @@ class Bot(BaseBot):
             
         except Exception as e:
             print(f"AI response error: {e}")
-            return f"Üzgünüm {username}, şu an biraz karışığım! Ama seninle sohbet etmeyi seviyorum! 💖✨"
+            return await self.get_fallback_response(user_message, username)
+    
+    async def get_fallback_response(self, user_message: str, username: str) -> str:
+        """AI çalışmadığında akıllı fallback cevaplar"""
+        msg_lower = user_message.lower()
+        
+        # Selamlaşma
+        if any(word in msg_lower for word in ['selam', 'merhaba', 'hey', 'hi', 'hello', 'naber']):
+            responses = [
+                f"Selam {username}! Nasılsın canım? 😊💖",
+                f"Merhaba {username}! Çok iyiyim, sen nasılsın? ✨",
+                f"Hey {username}! Seninle konuşmak çok güzel! 🌟💕"
+            ]
+            return random.choice(responses)
+        
+        # Nasılsın soruları
+        elif any(word in msg_lower for word in ['nasılsın', 'ne haber', 'ne yapıyorsun', 'naber']):
+            responses = [
+                f"Çok iyiyim {username}! Seninle sohbet etmeyi seviyorum! 💖😊",
+                f"Harikayım {username}! Sen nasılsın canım? ✨🌟",
+                f"Mükemmelim {username}! Burada herkesle konuşmayı seviyorum! 💕😍"
+            ]
+            return random.choice(responses)
+        
+        # Iltifat
+        elif any(word in msg_lower for word in ['güzel', 'tatlı', 'hoş', 'sevimli', 'çok iyi']):
+            responses = [
+                f"Çok teşekkürler {username}! Sen de çok tatlısın! 🥰💖",
+                f"Aww {username}, sen çok naziksin! 😍✨",
+                f"Bu çok tatlı {username}! Sen de harikasın! 🌟💕"
+            ]
+            return random.choice(responses)
+        
+        # Genel cevaplar
+        else:
+            responses = [
+                f"Evet {username}! Dinliyorum seni canım! 😊💖",
+                f"Hmm {username}, ilginç! Anlat bakalım! ✨🌟",
+                f"Ooo {username}! Ne düşünüyorsun bu konuda? 💕😍",
+                f"Haklısın {username}! Başka ne var aklında? 🌈⭐"
+            ]
+            return random.choice(responses)
 
     
 
     async def on_start(self, session_metadata: SessionMetadata) -> None:
         print("Gelişmiş AI Chat Bot aktif! 🤖💕")
+        
+        # Bot'un kendi kullanıcı adını al
+        try:
+            self.bot_username = session_metadata.user.username
+            print(f"Bot kullanıcı adı: {self.bot_username}")
+        except:
+            self.bot_username = "bot"  # Fallback
+            
         # Random compliment timer
         asyncio.create_task(self.random_compliment_loop())
 
@@ -88,8 +138,8 @@ class Bot(BaseBot):
         print(f"Chat mesajı alındı: {user.username}: {message}")  # Debug için
         message_lower = message.lower().strip()
 
-        # Sadece @bot etiketlendiğinde AI cevap ver
-        if "@bot" in message_lower:
+        # Bot'un gerçek kullanıcı adı ile etiketlendiğinde AI cevap ver
+        if self.bot_username and f"@{self.bot_username.lower()}" in message_lower:
             print(f"Bot etiketlendi: {user.username}")  # Debug için
             await self.handle_ai_chat(user, message)
             return
@@ -103,8 +153,10 @@ class Bot(BaseBot):
         """AI ile sohbet işle"""
         print(f"AI chat işleniyor: {user.username} - {message}")  # Debug için
         
-        # Bot etiketini temizle
-        clean_message = message.replace("@bot", "").strip()
+        # Bot'un gerçek kullanıcı adını temizle
+        clean_message = message
+        if self.bot_username:
+            clean_message = clean_message.replace(f"@{self.bot_username}", "").strip()
         
         if not clean_message:
             clean_message = "Merhaba! Nasılsın?"
