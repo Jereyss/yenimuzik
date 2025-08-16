@@ -8,14 +8,16 @@ from highrise.__main__ import *
 import random
 import asyncio
 import time
-from openai import OpenAI
+import replicate
 import os
 
 class Bot(BaseBot):
     def __init__(self):
         super().__init__()
-        # OpenAI client - bu secrets tool ile ayarlanmalı
-        self.openai_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+        # Replicate client - REPLICATE_API_KEY secrets ile ayarlanmalı
+        self.replicate_token = os.getenv('REPLICATE_API_KEY')
+        if self.replicate_token:
+            os.environ["REPLICATE_API_TOKEN"] = self.replicate_token
         self.bot_username = None  # Bot'un kendi kullanıcı adını saklayacak
         
         self.compliments = [
@@ -47,22 +49,39 @@ class Bot(BaseBot):
         self.random_compliment_timer = 0
 
     async def generate_ai_response(self, user_message: str, username: str) -> str:
-        """OpenAI GPT ile akıllı cevap üret"""
+        """Replicate AI ile akıllı cevap üret"""
         try:
-            if not self.openai_client.api_key:
+            if not self.replicate_token:
                 return await self.get_fallback_response(user_message, username)
 
-            response = self.openai_client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": self.ai_personality},
-                    {"role": "user", "content": f"{username} sana şunu söylüyor: {user_message}"}
-                ],
-                max_tokens=150,
-                temperature=0.8
+            # Replicate'te Llama veya başka bir model kullan
+            prompt = f"""Sen Highrise oyunundaki çok tatlı, konuşkan ve eğlenceli bir AI botsun. 
+Özelliklerin:
+- Çok tatlı ve sevimli konuşuyorsun
+- Emoji kullanmayı seviyorsun 💖✨🌟
+- Türkçe konuşuyorsun
+- Highrise oyuncularıyla sohbet etmeyi seviyorsun
+- Arada sırada iltifat ediyorsun
+- Pozitif ve enerjiksin
+- Kısa ve tatlı cevaplar veriyorsun (maksimum 2-3 cümle)
+- Gaming, moda, dans, müzik gibi konulardan hoşlanıyorsun
+- Her zaman kibar ve saygılısın
+
+{username} sana şunu söylüyor: {user_message}
+
+Ona tatlı bir şekilde cevap ver:"""
+
+            output = replicate.run(
+                "meta/llama-2-70b-chat:02e509c789964a7ea8736978a43525956ef40397be9033abf9fd2badfe68c9e3",
+                input={
+                    "prompt": prompt,
+                    "max_new_tokens": 150,
+                    "temperature": 0.8,
+                    "system_prompt": "Sen çok tatlı ve sevimli bir Türkçe AI botsun. Kısa ve tatlı cevaplar veriyorsun."
+                }
             )
             
-            ai_response = response.choices[0].message.content.strip()
+            ai_response = "".join(output).strip()
             
             # Emoji ekle eğer yoksa
             if not any(emoji in ai_response for emoji in ['😊', '💖', '✨', '🌟', '😍', '🥰', '💕', '🌈', '⭐', '💫']):
@@ -119,7 +138,7 @@ class Bot(BaseBot):
     
 
     async def on_start(self, session_metadata: SessionMetadata) -> None:
-        print("Gelişmiş AI Chat Bot aktif! 🤖💕")
+        print("Gelişmiş AI Chat Bot (Replicate) aktif! 🤖💕")
         
         # Bot'un kendi kullanıcı adını al
         try:
