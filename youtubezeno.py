@@ -36,7 +36,7 @@ SERVER_HOST = "link.zeno.fm" # dont change.
 SERVER_PORT = 80 # dont change
 MOUNT_POINT = "/wrmddxrooeyvv" # mount point from your settings
 STREAM_USERNAME = "source" # dont change
-STREAM_PASSWORD = "dIL0ui8k" # your mount password from settings
+STREAM_PASSWORD = "dIL0u18k" # your mount password from settings
 
 AUDIO_FILES = [
     "Nothing.mp3"

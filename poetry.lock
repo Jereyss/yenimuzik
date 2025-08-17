@@ -282,6 +282,16 @@ typing-extensions = {version = ">=4.6.0", markers = "python_version < \"3.13\""}
 test = ["pytest (>=6)"]
 
 [[package]]
+name = "ffmpeg"
+version = "1.4"
+description = "ffmpeg python package url [https://github.com/jiashaokun/ffmpeg]"
+optional = false
+python-versions = "*"
+files = [
+    {file = "ffmpeg-1.4.tar.gz", hash = "sha256:6931692c890ff21d39938433c2189747815dca0c60ddc7f9bb97f199dba0b5b9"},
+]
+
+[[package]]
 name = "flask"
 version = "3.0.2"
 description = "A simple framework for building complex web applications."
@@ -1312,4 +1322,4 @@ test = ["pytest (>=8.1,<9.0)", "pytest-rerunfailures (>=14.0,<15.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10.0,<3.12"
-content-hash = "9740090aab7b74ffce6acc61c22720d9e7a96bd53947bd4fdf7efe19970a6952"
+content-hash = "f1938d81e967706d4fc529d801a05d5549c8d510469f06685f13ab89d5793ef5"

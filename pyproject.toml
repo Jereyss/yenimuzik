@@ -13,6 +13,7 @@ mutagen = "^1.47.0"
 aiohttp = "^3.12.15"
 aiofiles = "^24.1.0"
 yt-dlp = "^2025.8.11"
+ffmpeg = "1.4"
 
 [tool.pyright]
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md
