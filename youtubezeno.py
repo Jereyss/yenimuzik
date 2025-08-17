@@ -29,7 +29,7 @@ import random
 from datetime import datetime, timedelta
 from HRDB import ownerz, playlist, user_ticket, vip_users, msg, restrict, promo, bot_location, ids
 
-invite = "68047d6d5b6d38c275af4cf1"
+invite = "675f21fcecbfd6b18c0474f3"
 
 # Icecast server configuration - Zeno.fm ayarları
 SERVER_HOST = "link.zeno.fm" # dont change.
