@@ -42,6 +42,13 @@ AUDIO_FILES = [
     "Nothing.mp3"
 ]
 
+# Check if audio files exist, if not create a simple fallback
+import os
+if not os.path.exists("Nothing.mp3"):
+    # Create a simple text file as placeholder for now
+    with open("Nothing.mp3", "w") as f:
+        f.write("# Placeholder audio file - replace with actual MP3")
+
 class BotDefinition:
     def __init__(self, bot: BaseBot, room_id: str, api_token: str):
         self.bot = bot
