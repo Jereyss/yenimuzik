@@ -371,23 +371,23 @@ class SEA(BaseBot):
                         pass
                         
         if message.lower() == "no":
-            if user.username == "_M.O.R.O_" or user.username in ownerz:
+            if user.username == "Atknz" or user.username in ownerz:
                 if user.username in self.choices:
                     await self.highrise.send_whisper(user.id, "Cancelled operation.")
                     del self.choices[user.username]
         
         if message.lower() == "yes":
-            if user.username == "_M.O.R.O_" or user.username in ownerz:
+            if user.username == "Atknz" or user.username in ownerz:
                 if user.username in self.choices:
                     new_bitrate = self.choices[user.username]
                     self.bitrate = new_bitrate
                     await self.highrise.chat(f"Successfully updated audio bitrate to {new_bitrate}.")
                     del self.choices[user.username]
         
-        if message.startswith("/cbit") and (user.username == "_M.O.R.O_" or user.username in ownerz):
+        if message.startswith("/cbit") and (user.username == "Atknz" or user.username in ownerz):
             await self.highrise.send_whisper(user.id, f"Currently audio is being broadcasted at {self.bitrate}bps.")
         
-        if message.startswith("/bitrate ") and (user.username == "_M.O.R.O_" or user.username in ownerz):
+        if message.startswith("/bitrate ") and (user.username == "Atknz" or user.username in ownerz):
             parts = message.split(" ")
             if len(parts) > 1:
                 if parts[1].endswith("k") and parts[1][:-1].isdigit():
@@ -401,7 +401,7 @@ class SEA(BaseBot):
             else:
                 await self.highrise.send_whisper(user.id, "Invalid command, usage: /bitrate [number]k\nExample: /bitrate 128k")
         
-        if message == "/restart" and (user.username == "_M.O.R.O_" or user.username in ownerz):
+        if message == "/restart" and (user.username == "Atknz" or user.username in ownerz):
             try:
                 await self.highrise.send_whisper(user.id, "Restarting the bot...")
                 await self.restart_bot()
@@ -635,7 +635,7 @@ class SEA(BaseBot):
                 print(f"Error in /queue command: {e}")
                 await self.highrise.send_whisper(user.id, "Error checking the queue.")
                 
-        if message.startswith("/info ") and (user.username in ownerz or user.username == "_M.O.R.O_"):
+        if message.startswith("/info ") and (user.username in ownerz or user.username == "Atknz"):
             try:
                 info = message.split(" ", 1)[1]
                 infol = info.replace("@", "")
@@ -673,7 +673,7 @@ class SEA(BaseBot):
             except:
                 await self.highrise.send_whisper(user.id, "Nuh uh")
 
-        if message.startswith("/vipz") and (user.username in ownerz or user.username == "_M.O.R.O_"):
+        if message.startswith("/vipz") and (user.username in ownerz or user.username == "Atknz"):
             try:
                 if vip_users:
                     message_content = ""
@@ -692,7 +692,7 @@ class SEA(BaseBot):
                 print(f"Error in /vipz command: {e}")
                 await self.highrise.send_whisper(user.id, "Error checking the queue.")
         
-        if message.startswith("/remv ") and (user.username in ownerz or user.username == "_M.O.R.O_"):
+        if message.startswith("/remv ") and (user.username in ownerz or user.username == "Atknz"):
             try:
                 current_date = datetime.now().strftime("%d/%m/%Y")
                 remvip = message.split(" ", 1)[1]
@@ -713,7 +713,7 @@ class SEA(BaseBot):
             except:
                 pass
                 
-        if message.startswith("/addv ") and (user.username in ownerz or user.username == "_M.O.R.O_"):
+        if message.startswith("/addv ") and (user.username in ownerz or user.username == "Atknz"):
             try:
                 current_date = datetime.now().strftime("%d/%m/%Y")
                 vip = message.split(" ", 1)[1]
@@ -751,7 +751,7 @@ class SEA(BaseBot):
             except Exception as e:
                 print(f"An error occurred: {e}")
 
-        if message.startswith("/give") and (user.username in ownerz or user.username == "_M.O.R.O_"):
+        if message.startswith("/give") and (user.username in ownerz or user.username == "Atknz"):
             try:
                 _, username, value = message.split(" ", 2)
                 username = username.strip("@")
@@ -764,7 +764,7 @@ class SEA(BaseBot):
             except Exception as e:
                 print(f"An error occurred: {e}")
 
-        if message.startswith("/rfav ") and (user.username in ownerz or user.username == "_M.O.R.O_"):
+        if message.startswith("/rfav ") and (user.username in ownerz or user.username == "Atknz"):
             try:
                 parts = message.split(" ")
                 if len(parts) > 1 and parts[1].isdigit():
@@ -806,7 +806,7 @@ class SEA(BaseBot):
                 print(f"Error in /flist command: {e}")
                 await self.highrise.send_whisper(user.id, "Error checking the queue.")
 
-        if message.startswith("/fav") and (user.username in ownerz or user.username == "_M.O.R.O_"):
+        if message.startswith("/fav") and (user.username in ownerz or user.username == "Atknz"):
             try:
                 if self.now:
                     fav = self.now[0]
@@ -831,7 +831,7 @@ class SEA(BaseBot):
                 print("Error in /fav command:", e)
 
         if message.startswith("/cfav"):
-            if user.username in ownerz or user.username == "_M.O.R.O_":
+            if user.username in ownerz or user.username == "Atknz":
                 if playlist:
                     for item in playlist:
                         if os.path.exists(item['url']):
@@ -846,7 +846,7 @@ class SEA(BaseBot):
             else:
                 await self.highrise.send_whisper(user.id, "You dont have access to this command.")
 
-        if message.startswith("/cmsg") and (user.username in ownerz or user.username == "_M.O.R.O_"):
+        if message.startswith("/cmsg") and (user.username in ownerz or user.username == "Atknz"):
             try:
                 if msg:
                     msg.clear()
@@ -856,7 +856,7 @@ class SEA(BaseBot):
             except:
                 print("Error in /cmsg:", e)
 
-        if message.startswith("/rmsg ") and (user.username in ownerz or user.username == "_M.O.R.O_"):
+        if message.startswith("/rmsg ") and (user.username in ownerz or user.username == "Atknz"):
             try:
                 user = message.split(" ", 1)[1]
                 username = user.replace("@", "")
@@ -877,7 +877,7 @@ class SEA(BaseBot):
             except Exception as e:
                     print("Error in /rmsg:", e)
 
-        if message.startswith("/msg ") and (user.username in ownerz or user.username == "_M.O.R.O_"):
+        if message.startswith("/msg ") and (user.username in ownerz or user.username == "Atknz"):
             try:
                 user = message.split(" ", 1)[1]
                 username = user.replace("@", "")
@@ -950,7 +950,7 @@ class SEA(BaseBot):
 
         if message.startswith("/cpromo"):
             try:
-                if user.username == "_M.O.R.O_" or user.username in ownerz:
+                if user.username == "Atknz" or user.username in ownerz:
                     if promo:
                         promo.clear()
                         await self.highrise.chat("Cleared promo list.")
@@ -972,7 +972,7 @@ class SEA(BaseBot):
             except Exception as e:
                 print("Error in /accs:", e)
 
-        if message.startswith("/withdraw ") and (user.username in ownerz or user.username == "_M.O.R.O_"):
+        if message.startswith("/withdraw ") and (user.username in ownerz or user.username == "Atknz"):
             try:
                 parts = message.split(" ")
                 if len(parts) != 2:
@@ -1055,7 +1055,7 @@ class SEA(BaseBot):
                 pass
     
     async def bot_wallet(self, user: User, message: str):
-        if user.username in ownerz or user.username == "_M.O.R.O_":
+        if user.username in ownerz or user.username == "Atknz":
             wallet = await self.highrise.get_wallet()
             for item in wallet.content:
                 if item.type == "gold":
@@ -1079,15 +1079,15 @@ class SEA(BaseBot):
                         await asyncio.sleep(2)
                         await self.highrise.send_whisper(user.id, "Type /play 'song' to request a song. Type /help for all commands.")
                         await asyncio.sleep(1)
-                        await self.highrise.send_whisper(user.id, "If the bot malfunctions pm @_M.O.R.O_.")
+                        await self.highrise.send_whisper(user.id, "If the bot malfunctions pm @Atknz")
                     else:
                         await self.highrise.send_whisper(user.id, "Welcome back to room <3.\nType /wallet to get info of your tickets. Type /help for all commands.")
                         await asyncio.sleep(2)
-                        await self.highrise.send_whisper(user.id, "If the bot malfunctions pm @_M.O.R.O_.")
+                        await self.highrise.send_whisper(user.id, "If the bot malfunctions pm @Atknz")
                 else:
                     await self.highrise.send_whisper(user.id, "Welcome to room <3.\nThis is a music bot. Type /rlist to get ratelist, each song request costs 1 ticket. Type /wallet to get info of your tickets. Type /play to request a song.")
                     await asyncio.sleep(2)
-                    await self.highrise.send_whisper(user.id, "If the bot malfunctions pm @_M.O.R.O_.")
+                    await self.highrise.send_whisper(user.id, "If the bot malfunctions pm @Atknz")
             else:
                 pass
         except:
@@ -1132,7 +1132,7 @@ class SEA(BaseBot):
 
                 else:
                     vip_users.append(sender.username)
-                    await self.highrise.send_whisper(user.id, "Youre added to vip users. If you face any error pm @_M.O.R.O_. Enjoy <3")
+                    await self.highrise.send_whisper(user.id, "Youre added to vip users. If you face any error pm @Atknz Enjoy <3")
                     await self.highrise.send_whisper(user.id, f"\n*NOTE*: your vip is started from {current_date}, Make sure to renew your vip before {get_ordinal(day)} of next month.")
                     for user_id in msg:
                         message_id = f"1_on_1:{user_id}:{self.bot_id}"
@@ -1151,7 +1151,7 @@ class SEA(BaseBot):
                 pass
         except Exception as e:
             print(e)
-            await self.highrise.send_whisper(sender.id, f"Error occurred: {e}. Please inform @_M.O.R.O_.")
+            await self.highrise.send_whisper(sender.id, f"Error occurred: {e}. Please inform @Atknz")
 
     async def add_to_queue(self, query, user):
         """Search for a song and add it to the queue using yt-dlp."""
