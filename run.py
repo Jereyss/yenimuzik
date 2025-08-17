@@ -2,6 +2,13 @@
 import threading
 import asyncio
 from youtubezeno import SEA, start_streaming
+from highrise import __main__
+
+class BotDefinition:
+    def __init__(self, bot, room_id: str, api_token: str):
+        self.bot = bot
+        self.room_id = room_id
+        self.api_token = api_token
 
 async def main():
     room_id = "675f21fcecbfd6b18c0474f3"
@@ -13,10 +20,11 @@ async def main():
     streaming_thread.daemon = True
     streaming_thread.start()
     
+    definitions = [BotDefinition(bot_instance, room_id, token)]
+    
     while True:
         try:
-            await asyncio.sleep(5)
-            await bot_instance.run(room_id, token)
+            await __main__.main(definitions)
         except Exception as e:
             print(f"Bot error: {e}. Restarting in 5 seconds...")
             await asyncio.sleep(5)
