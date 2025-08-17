@@ -31,12 +31,12 @@ from HRDB import ownerz, playlist, user_ticket, vip_users, msg, restrict, promo,
 
 invite = "68047d6d5b6d38c275af4cf1"
 
-# Icecast server configuration
+# Icecast server configuration - Zeno.fm ayarları
 SERVER_HOST = "link.zeno.fm" # dont change.
 SERVER_PORT = 80 # dont change
-MOUNT_POINT = "/" # put ur mountpoint after / in ""
+MOUNT_POINT = "/wrmdxrooeyvv" # mount point from your settings
 STREAM_USERNAME = "source" # dont change
-STREAM_PASSWORD = ""#"put your password"
+STREAM_PASSWORD = "dIL0ui8k" # your mount password from settings
 
 AUDIO_FILES = [
     "Nothing.mp3"
