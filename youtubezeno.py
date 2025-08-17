@@ -66,8 +66,8 @@ class SEA(BaseBot):
         self.message = deque()
         self.wait = []
         self.state_file = "bot_state.json"
-        self.req_files_dir = "/home/container/reqfiles"
-        self.fav_dir = "/home/container/fav"
+        self.req_files_dir = "./reqfiles"
+        self.fav_dir = "./fav"
         os.makedirs(self.fav_dir, exist_ok=True)
         os.makedirs(self.req_files_dir, exist_ok=True)
         self.load_state()
@@ -816,7 +816,7 @@ class SEA(BaseBot):
                     if fav['url'] in AUDIO_FILES:
                         await self.highrise.send_whisper(user.id, "• Note: you can only add requested songs to favorites.")
                     else:
-                        permanent_file = f"/home/container/fav/{fav['title']}.mp3"
+                        permanent_file = f"./fav/{fav['title']}.mp3"
                         try:
                             shutil.copy(fav['url'], permanent_file)
                         except Exception as e:
