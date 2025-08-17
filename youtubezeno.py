@@ -34,7 +34,7 @@ invite = "68047d6d5b6d38c275af4cf1"
 # Icecast server configuration - Zeno.fm ayarları
 SERVER_HOST = "link.zeno.fm" # dont change.
 SERVER_PORT = 80 # dont change
-MOUNT_POINT = "/wrmdxrooeyvv" # mount point from your settings
+MOUNT_POINT = "/wrmddxrooeyvv" # mount point from your settings
 STREAM_USERNAME = "source" # dont change
 STREAM_PASSWORD = "dIL0ui8k" # your mount password from settings
 
@@ -421,6 +421,23 @@ class SEA(BaseBot):
                 await self.highrise.send_whisper(user.id, "\n/rlist - Get info about tickets ratelist.\n/info @user - Get user's tickets info.\n/fav - To add to fav playlist.\n/rfav [number] remove from fav playlist.\n/flist - Prints fav playlist.")
                 await asyncio.sleep(1)
                 await self.highrise.send_whisper(user.id, "\n/cfav - Clears fav playlist.\n/transfer @user [number] - Transfer your tickets to user, (min 6 tickets)") 
+                return
+            except:
+                pass
+
+        if message.startswith("/ahelp") and user.username in ownerz:
+            try:
+                await self.highrise.send_whisper(user.id,"\nADMIN COMMANDS:\n/add @user - Add user to owners\n/rem @user - Remove user from owners\n/addv @user - Add user to VIP\n/remv @user - Remove user from VIP")
+                await asyncio.sleep(3)
+                await self.highrise.send_whisper(user.id, "\n/give @user [number] - Give tickets to user\n/info @user - Check user's tickets\n/top [number] - Move song to top of queue\n/res [song] - Restrict a song\n/unres [song] - Unrestrict a song")
+                await asyncio.sleep(1)
+                await self.highrise.send_whisper(user.id, "\n/promo [message] - Add promo message\n/rpromo [message] - Remove promo message\n/cpromo - Clear all promo messages\n/msg @user - Add user to message list\n/rmsg @user - Remove user from message list")
+                await asyncio.sleep(1)
+                await self.highrise.send_whisper(user.id, "\n/cmsg - Clear message list\n/vipz - List all VIP users\n/accs - Account statistics\n/withdraw [amount] - Withdraw gold\n/bwallet - Check bot's wallet")
+                await asyncio.sleep(1)
+                await self.highrise.send_whisper(user.id, "\n/setbot - Set bot location\n/base - Move bot to set location\n/bitrate [number]k - Change audio bitrate\n/cbit - Check current bitrate\n/restart - Restart the bot")
+                await asyncio.sleep(1)
+                await self.highrise.send_whisper(user.id, "\n/equip [item] - Equip item\n/remove [category] - Remove item category\n/color [category] [palette] - Change item color\n/invite - Invite all users\n/fav - Add current song to favorites\n/rfav [number] - Remove from favorites\n/cfav - Clear favorites")
                 return
             except:
                 pass
@@ -1390,14 +1407,17 @@ def connect_to_icecast():
 
         auth = f"source:{STREAM_PASSWORD}"
         headers = (
-            f"PUT {MOUNT_POINT} HTTP/1.0\r\n"
+            f"PUT {MOUNT_POINT} HTTP/1.1\r\n"
+            f"Host: {SERVER_HOST}\r\n"
             f"Authorization: Basic {base64.b64encode(auth.encode()).decode()}\r\n"
             f"Content-Type: audio/mpeg\r\n"
-            f"ice-name: ROBINS MUSIC ®\r\n"
+            f"User-Agent: Icecast/2.4.0\r\n"
+            f"ice-name: ROBINS MUSIC\r\n"
             f"ice-genre: Various\r\n"
-            f"ice-url: http://{SERVER_HOST}:{SERVER_PORT}{MOUNT_POINT}\r\n"
+            f"ice-url: https://stream.zeno.fm{MOUNT_POINT}\r\n"
             f"ice-public: 1\r\n"
-            f"ice-audio-info: bitrate=320\r\n"
+            f"ice-audio-info: bitrate=128000;samplerate=44100;channels=2\r\n"
+            f"Connection: close\r\n"
             f"\r\n"
         )
         sock.sendall(headers.encode('utf-8'))
