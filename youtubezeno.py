@@ -131,7 +131,7 @@ class SEA(BaseBot):
                 await asyncio.sleep(7.3)
             except Exception as e:
                 break  # إذا كان الخطأ غير متوقع، نوقف الحلقة
-    
+
     async def on_start(self, session_metadata: SessionMetadata):
         try:
             self.username = await self.get_username(session_metadata.user_id)
@@ -205,11 +205,11 @@ class SEA(BaseBot):
                     await self.highrise.send_message(conversation_id, "Your account must be atleast 30 days or older.")
         except Exception as e:
             print(e)
-                                
+
     async def get_username(self, user_id):
         user_info = await self.webapi.get_user(user_id)
         return user_info.user.username
-    
+
     async def invite_all(self, user):
         if not user.username in ownerz:
             await self.highrise.send_whisper(user.id, "You cant use this command.")
@@ -225,7 +225,7 @@ class SEA(BaseBot):
             await asyncio.sleep(3)
         except Exception as e:
             await self.highrise.chat(f"error: {e}")
-            
+
     async def color(self: BaseBot, category: str, color_palette: int):
         outfit = (await self.highrise.get_my_outfit()).outfit
         for outfit_item in outfit:
@@ -237,13 +237,13 @@ class SEA(BaseBot):
                     await self.highrise.chat(f"The bot isn't using any item from the category '{category}'.")
                     return
         await self.highrise.set_outfit(outfit)
-        
+
     async def equip(self, item_name: str):
         items = (await self.webapi.get_items(item_name=item_name)).items
         if not items:
             await self.highrise.chat(f"Item '{item_name}' not found.")
             return
-        
+
         item = items[0]
         item_id, category = item.item_id, item.category
 
@@ -320,7 +320,7 @@ class SEA(BaseBot):
                     await self.highrise.send_whisper(user.id, "Invalid format. Use: /remove [item_name]")
             except:
                 pass
-            
+
         if message.startswith("/equip"):
             if not user.username in ownerz:
                 return
@@ -333,7 +333,7 @@ class SEA(BaseBot):
                     await self.highrise.send_whisper(user.id, "Invalid format. Use: /equip [item_name]")
             except:
                 pass
-            
+
         if message.startswith("/color"):
             if not user.username in ownerz:
                 return
@@ -347,7 +347,7 @@ class SEA(BaseBot):
                     await self.highrise.send_whisper(user.id, "The color palette must be a number.")
             else:
                 await self.highrise.send_whisper(user.id, "Invalid format. Use: /color [category] [palette_number]")
-                
+
         if message.startswith("/invite"):
             try:
                 await self.invite_all(user)
@@ -369,13 +369,13 @@ class SEA(BaseBot):
                             await self.highrise.send_whisper(user.id, "Operation cancelled.")
                     except:
                         pass
-                        
+
         if message.lower() == "no":
             if user.username == "Atknz" or user.username in ownerz:
                 if user.username in self.choices:
                     await self.highrise.send_whisper(user.id, "Cancelled operation.")
                     del self.choices[user.username]
-        
+
         if message.lower() == "yes":
             if user.username == "Atknz" or user.username in ownerz:
                 if user.username in self.choices:
@@ -383,10 +383,10 @@ class SEA(BaseBot):
                     self.bitrate = new_bitrate
                     await self.highrise.chat(f"Successfully updated audio bitrate to {new_bitrate}.")
                     del self.choices[user.username]
-        
+
         if message.startswith("/cbit") and (user.username == "Atknz" or user.username in ownerz):
             await self.highrise.send_whisper(user.id, f"Currently audio is being broadcasted at {self.bitrate}bps.")
-        
+
         if message.startswith("/bitrate ") and (user.username == "Atknz" or user.username in ownerz):
             parts = message.split(" ")
             if len(parts) > 1:
@@ -400,7 +400,7 @@ class SEA(BaseBot):
                     await self.highrise.send_whisper(user.id, "Invalid command, usage: /bitrate [number]k\nExample: /bitrate 256k")
             else:
                 await self.highrise.send_whisper(user.id, "Invalid command, usage: /bitrate [number]k\nExample: /bitrate 128k")
-        
+
         if message == "/restart" and (user.username == "Atknz" or user.username in ownerz):
             try:
                 await self.highrise.send_whisper(user.id, "Restarting the bot...")
@@ -424,7 +424,7 @@ class SEA(BaseBot):
                 return
             except:
                 pass
-        
+
         if message.startswith("/play"):
             if (user.username in vip_users) or (user.username in user_ticket and user_ticket[user.username] > 0) or (user.username in ownerz):
                 try:
@@ -512,7 +512,7 @@ class SEA(BaseBot):
             except Exception as e:
                 print(f"Error in /now command: {e}")
                 await self.highrise.send_whisper(user.id, "Error processing the request.")
-        
+
         if message.startswith("/wallet"):
             try:
                 if user.username in user_ticket:
@@ -543,7 +543,7 @@ class SEA(BaseBot):
             except Exception as e: 
                     print(f"Error in /next command: {e}") 
                     await self.highrise.send_whisper(user.id, "Error checking queue")
-        
+
         if message.startswith("/top") and user.username in ownerz:
             try:
                 parts = message.split(" ")
@@ -560,7 +560,7 @@ class SEA(BaseBot):
                     await self.highrise.send_whisper(user.id, "Invalid command. Please use /top with number from queue")
             except Exception as e:
                 print(f"Error moving song to top: {e}")
-       
+
         if message.startswith("/skip"):
             try:    
                 parts = message.split(" ")
@@ -569,7 +569,7 @@ class SEA(BaseBot):
                         return
                     index = int(parts[1]) - 1
 
-                    if self.now[0]['url'] in AUDIO_FILES:
+                    if self.now and self.now[0]['url'] in AUDIO_FILES:
                         adjusted_index = index
                     else:
                         adjusted_index = index + 1
@@ -584,11 +584,14 @@ class SEA(BaseBot):
                         if os.path.exists(self.req_files[adjusted_index]['url']):
                             os.remove(self.req_files[adjusted_index]['url'])
                         self.req_files.remove(removed_file)
-                        
+
                         await self.highrise.chat(f"🎵 Removed from queue: {fix_rem}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {rem_length}")
                     else: 
                         await self.highrise.send_whisper(user.id, f"No song found in queue with {get_ordinal(index + 1)} number.") 
                 else:
+                    if not self.now:
+                        await self.highrise.send_whisper(user.id, "Nothing is playing right now.")
+                        return
                     rem_length = self.now[0]['audio_length']
                     removed_file = self.now[0]
                     req_user = self.now[0]['user']
@@ -606,7 +609,7 @@ class SEA(BaseBot):
         if message.startswith("/queue"): 
             try:
                 if len(self.req_files) > 0:
-                    if self.now[0]['url'] not in AUDIO_FILES:
+                    if self.now and self.now[0]['url'] not in AUDIO_FILES:
                         global_index = 1
                     else:
                         global_index = 0
@@ -634,7 +637,7 @@ class SEA(BaseBot):
             except Exception as e:
                 print(f"Error in /queue command: {e}")
                 await self.highrise.send_whisper(user.id, "Error checking the queue.")
-                
+
         if message.startswith("/info ") and (user.username in ownerz or user.username == "Atknz"):
             try:
                 info = message.split(" ", 1)[1]
@@ -648,7 +651,7 @@ class SEA(BaseBot):
                     await self.highrise.chat(f"User {info} does not have any ticket.")
             except Exception as e:
                 print(e)
-                
+
         if message.startswith("/rem ") and user.username in ownerz:
             try:
                 remvip = message.split(" ", 1)[1]
@@ -660,7 +663,7 @@ class SEA(BaseBot):
                     await self.highrise.send_whisper(user.id, f"{rem} not in ownerz.")
             except:
                 pass
-                
+
         if message.startswith("/add ") and user.username in ownerz:
             try:
                 vip = message.split(" ", 1)[1]
@@ -691,7 +694,7 @@ class SEA(BaseBot):
             except Exception as e:
                 print(f"Error in /vipz command: {e}")
                 await self.highrise.send_whisper(user.id, "Error checking the queue.")
-        
+
         if message.startswith("/remv ") and (user.username in ownerz or user.username == "Atknz"):
             try:
                 current_date = datetime.now().strftime("%d/%m/%Y")
@@ -712,7 +715,7 @@ class SEA(BaseBot):
                     await self.highrise.send_whisper(user.id, f"{rem} not a vip.")
             except:
                 pass
-                
+
         if message.startswith("/addv ") and (user.username in ownerz or user.username == "Atknz"):
             try:
                 current_date = datetime.now().strftime("%d/%m/%Y")
@@ -908,7 +911,7 @@ class SEA(BaseBot):
                     await self.highrise.chat("This song is already is restricted.")
             except Exception as e:
                 print(f"Error in /restrict command: {e}")
-                
+
         if message.startswith("/unres ") and user.username in ownerz:
             try:    
                 res = message.split(" ", 1)[1]
@@ -933,7 +936,7 @@ class SEA(BaseBot):
                     await self.highrise.chat("Please provide a promotional message after /promo.")
             except Exception as e:
                 print(f"Error in /promo command: {e}")
-                
+
         if message.startswith("/rpromo ") and user.username in ownerz:
             try:    
                 prom = message.lstrip("/promo ").strip()
@@ -1053,7 +1056,7 @@ class SEA(BaseBot):
                 await self.bot_wallet(user, message)
             except:
                 pass
-    
+
     async def bot_wallet(self, user: User, message: str):
         if user.username in ownerz or user.username == "Atknz":
             wallet = await self.highrise.get_wallet()
@@ -1065,12 +1068,12 @@ class SEA(BaseBot):
             await self.highrise.send_whisper(f"Hello, {user.username}! I don't have any gold.")
         else:
             await self.highrise.send_whisper(user.id, "You don't have access to this command")
-    
+
     async def on_user_join(self, user: User, pos: Position) -> None:
         try:
             response = await self.webapi.get_user(user.id)
             joined_at = response.user.joined_at
-            
+
             if isinstance(joined_at, datetime):
                 one_month_ago = datetime.now(joined_at.tzinfo) - timedelta(days=30)
                 if joined_at <= one_month_ago:
@@ -1286,15 +1289,31 @@ class SEA(BaseBot):
                 attempts = 0
                 while attempts < 3:
                     buffered_file_path = await self.buffer_audio(track_url)
-                    file_size = os.path.getsize(buffered_file_path)
-                    if file_size >= 4 * 1024:
-                        break
+                    if buffered_file_path is None:
+                        attempts += 1
+                        await asyncio.sleep(1)
+                        continue
+                    
+                    try:
+                        file_size = os.path.getsize(buffered_file_path)
+                        if file_size >= 4 * 1024:
+                            break
+                    except FileNotFoundError:
+                        attempts += 1
+                        await asyncio.sleep(1)
+                        continue
                     attempts += 1
                     await asyncio.sleep(1)
+                else: # If loop finishes without break
+                    if buffered_file_path and os.path.exists(buffered_file_path):
+                        os.remove(buffered_file_path) # Clean up if it exists but is too small
+                    return None, None, None
 
-                if file_size >= 4 * 1024:
+                if os.path.getsize(buffered_file_path) >= 4 * 1024:
                     return buffered_file_path, track_duration, track
                 else:
+                    if buffered_file_path and os.path.exists(buffered_file_path):
+                        os.remove(buffered_file_path)
                     return None, None, None
         except Exception as e:
             print(f"Error searching track: {e}")
@@ -1320,7 +1339,7 @@ class SEA(BaseBot):
             except:
                 pass
             await asyncio.sleep(277)
-    
+
     async def print_messages(self):
         while True:
             try:
@@ -1339,7 +1358,7 @@ class SEA(BaseBot):
     async def run(self, room_id: str, token: str):
         definitions = [BotDefinition(self, room_id, token)]
         await __main__.main(definitions)
-    
+
     def get_audio_length(self, audio_path):
         try:
             audio = MP3(audio_path)
@@ -1368,7 +1387,7 @@ def connect_to_icecast():
         sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 3)
         sock.connect((SERVER_HOST, SERVER_PORT))
         print("Connected to Icecast server.")
-        
+
         auth = f"source:{STREAM_PASSWORD}"
         headers = (
             f"PUT {MOUNT_POINT} HTTP/1.0\r\n"
@@ -1382,10 +1401,10 @@ def connect_to_icecast():
             f"\r\n"
         )
         sock.sendall(headers.encode('utf-8'))
-        
+
         response = sock.recv(1024).decode('utf-8')
         print(f"Server response: {response}")
-        
+
         if "HTTP/1.0 200 OK" in response:
             print("Authentication successful.")
         else:
@@ -1422,7 +1441,7 @@ def start_streaming(bot_instance):
                             print("Stream interrupted, attempting reconnection...")
                             sock.close()
                             break
-
+                        
                         if bot_instance.skip:
                             bot_instance.skip = False
                             if bot_instance.now:
@@ -1433,6 +1452,11 @@ def start_streaming(bot_instance):
                                         break
                                 print(f"Skipped: {current_song['title']}")
                             continue
+                        
+                        # If stream_audio returns false, it means connection is lost, break inner loop to reconnect
+                        if not success:
+                            break
+
                 except Exception as e:
                     print(f"Error during streaming: {e}")
                     if sock:
@@ -1448,51 +1472,38 @@ def start_streaming(bot_instance):
 def stream_audio(sock, audio_file, bot_instance):
     try:
         print(f"Streaming audio file: {audio_file}")
-        if audio_file != "Nothing.mp3":
-            bot_instance.now.clear()
-            bot_instance.message.clear()
-            if audio_file in AUDIO_FILES:
-                bot_instance.now.append({
-                    'url': audio_file,
-                    'title': audio_file.replace(".mp3", ""),
-                    'user': None,
-                    'audio_length': bot_instance.get_audio_length(audio_file)
-                })
-                bot_instance.message.append({
-                    'url': audio_file,
-                    'title': audio_file.replace(".mp3", ""),
-                    'user': None,
-                    'audio_length': bot_instance.get_audio_length(audio_file)
-                })
-        
-        if playlist:
+        # Clear current song info before setting a new one
+        bot_instance.now.clear()
+        bot_instance.message.clear()
+
+        if audio_file in AUDIO_FILES:
+            song_title = audio_file.replace(".mp3", "")
+            audio_length = bot_instance.get_audio_length(audio_file)
+            bot_instance.now.append({'url': audio_file, 'title': song_title, 'user': None, 'audio_length': audio_length})
+            bot_instance.message.append({'url': audio_file, 'title': song_title, 'user': None, 'audio_length': audio_length})
+
+        elif playlist:
             matching_item = next((item for item in playlist if item['url'] == audio_file), None)
             if matching_item:
                 details = {
-                'url': matching_item['url'],
-                'title': matching_item['title'],
-                'user': None,
-                'audio_length': matching_item['audio_length']
+                    'url': matching_item['url'],
+                    'title': matching_item['title'],
+                    'user': None,
+                    'audio_length': matching_item['audio_length']
                 }
                 bot_instance.now.append(details)
                 bot_instance.message.append(details)
-    
-        if bot_instance.req_files:
-            if audio_file == bot_instance.req_files[0]['url']:
-                bot_instance.now.append({
-            'url': bot_instance.req_files[0]['url'],
-            'title': bot_instance.req_files[0]['title'],
-            'user': bot_instance.req_files[0]['user'],
-            'audio_length': bot_instance.req_files[0]['duration']
-        })
-                bot_instance.message.append({
-            'url': bot_instance.req_files[0]['url'],
-            'title': bot_instance.req_files[0]['title'],
-            'user': bot_instance.req_files[0]['user'],
-            'audio_length': bot_instance.req_files[0]['duration']
-        })
-        else:
-            pass
+
+        if bot_instance.req_files and audio_file == bot_instance.req_files[0]['url']:
+            details = {
+                'url': bot_instance.req_files[0]['url'],
+                'title': bot_instance.req_files[0]['title'],
+                'user': bot_instance.req_files[0]['user'],
+                'audio_length': bot_instance.req_files[0]['duration']
+            }
+            bot_instance.now.append(details)
+            bot_instance.message.append(details)
+
 
         command = [
             'ffmpeg',
@@ -1507,56 +1518,56 @@ def stream_audio(sock, audio_file, bot_instance):
             '-buffer_size', '500k',
             '-'
         ]
-        
+
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        
+        # Get audio length for potential skip message
+        audio_length_for_skip = None
+        if bot_instance.now:
+            audio_length_for_skip = bot_instance.now[0]['audio_length']
+            
         while True:
             data = process.stdout.read(4096)
+            
             if bot_instance.skip:
                 print(f"Skipping: {audio_file}")
                 process.terminate()
-                for index, item in enumerate(bot_instance.req_files):
-                    if item['url'] == audio_file:
-                        del bot_instance.req_files[index]
-                        break
-                if os.path.exists(audio_file):
-                    if audio_file not in AUDIO_FILES:
-                        if not any(item['url'] == audio_file for item in playlist):
-                            try:
-                                os.remove(audio_file)
-                                print(f"Temporary file removed: {audio_file}")
-                            except Exception as e:
-                                print(f"Error cleaning up temporary file {audio_file}: {e}")
-                return True
+                
+                # Remove from req_files if it was a requested song
+                if bot_instance.req_files and bot_instance.req_files[0]['url'] == audio_file:
+                    bot_instance.req_files.popleft()
+                
+                # Clean up temporary file if it's not a default AUDIO_FILE and not in playlist
+                if audio_file not in AUDIO_FILES and not any(item['url'] == audio_file for item in playlist):
+                    cleanup_temp_file(bot_instance, audio_file)
+                
+                return True # Indicate successful skip, allowing reconnection attempt
+                
             if not data:
                 process.terminate()
                 print(f"Finished streaming: {audio_file}")
-                bot_instance.message.clear()
-                bot_instance.now.clear()
-                # Clean up the req_files and now lists
-                for index, item in enumerate(bot_instance.req_files):
-                    if item['url'] == audio_file:
-                        del bot_instance.req_files[index]
-                        break
-                if os.path.exists(audio_file):
-                    if audio_file not in AUDIO_FILES:
-                        if not any(item['url'] == audio_file for item in playlist):
-                            try:
-                                os.remove(audio_file)
-                                print(f"Temporary file removed: {audio_file}")
-                            except Exception as e:
-                                print(f"Error cleaning up temporary file {audio_file}: {e}")
+                
+                # Clean up req_files and now lists
+                if bot_instance.req_files and bot_instance.req_files[0]['url'] == audio_file:
+                    bot_instance.req_files.popleft()
 
-                return True
+                # Clean up temporary file if it's not a default AUDIO_FILE and not in playlist
+                if audio_file not in AUDIO_FILES and not any(item['url'] == audio_file for item in playlist):
+                    cleanup_temp_file(bot_instance, audio_file)
+                
+                return True # Indicate successful stream completion
+            
             try:
                 sock.sendall(data)
             except (BrokenPipeError, ConnectionResetError) as e:
                 print(f"Connection lost while sending chunk: {e}")
                 process.terminate()
-                return False
+                return False # Indicate connection error
             time.sleep(0.05)
+            
     except Exception as e:
         print(f"Streaming error: {e}")
-        return False
+        return False # Indicate streaming error
 
 def cleanup_temp_file(self, temp_file_path):
     """Remove the temporary file from memory."""
