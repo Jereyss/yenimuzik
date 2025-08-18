@@ -1503,25 +1503,18 @@ def start_streaming(bot_instance):
                             audio_file = random.choice(AUDIO_FILES)
 
                         success = stream_audio(sock, audio_file, bot_instance)
+                        
+                        if bot_instance.skip:
+                            bot_instance.skip = False
+                            print("Skip processed, continuing to next song...")
+                            continue
+                        
                         if not success:
                             print("Stream interrupted, attempting reconnection...")
                             sock.close()
                             break
                         
-                        if bot_instance.skip:
-                            bot_instance.skip = False
-                            if bot_instance.now:
-                                current_song = bot_instance.now.popleft()
-                                for index, item in enumerate(bot_instance.req_files):
-                                    if item == current_song:
-                                        del bot_instance.req_files[index]
-                                        break
-                                print(f"Skipped: {current_song['title']}")
-                            continue
-                        
-                        # If stream_audio returns false, it means connection is lost, break inner loop to reconnect
-                        if not success:
-                            break
+                        # Song completed successfully, continue to next iteration
 
                 except Exception as e:
                     print(f"Error during streaming: {e}")
@@ -1589,11 +1582,6 @@ def stream_audio(sock, audio_file, bot_instance):
 
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
-        # Get audio length for potential skip message
-        audio_length_for_skip = None
-        if bot_instance.now:
-            audio_length_for_skip = bot_instance.now[0]['audio_length']
-            
         while True:
             data = process.stdout.read(4096)
             
@@ -1609,19 +1597,22 @@ def stream_audio(sock, audio_file, bot_instance):
                 if audio_file not in AUDIO_FILES and not any(item['url'] == audio_file for item in playlist):
                     cleanup_temp_file(bot_instance, audio_file)
                 
-                return True # Indicate successful skip, allowing reconnection attempt
+                return True # Indicate successful skip
                 
             if not data:
                 process.terminate()
                 print(f"Finished streaming: {audio_file}")
                 
-                # Clean up req_files and now lists
+                # Clean up req_files when song finishes naturally
                 if bot_instance.req_files and bot_instance.req_files[0]['url'] == audio_file:
                     bot_instance.req_files.popleft()
 
                 # Clean up temporary file if it's not a default AUDIO_FILE and not in playlist
                 if audio_file not in AUDIO_FILES and not any(item['url'] == audio_file for item in playlist):
                     cleanup_temp_file(bot_instance, audio_file)
+                
+                # Clear now playing info when song ends
+                bot_instance.now.clear()
                 
                 return True # Indicate successful stream completion
             
@@ -1630,6 +1621,7 @@ def stream_audio(sock, audio_file, bot_instance):
             except (BrokenPipeError, ConnectionResetError) as e:
                 print(f"Connection lost while sending chunk: {e}")
                 process.terminate()
+                # Don't remove from queue on connection error, so it can retry
                 return False # Indicate connection error
             time.sleep(0.05)
             
