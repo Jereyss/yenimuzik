@@ -8,21 +8,21 @@ from highrise import __main__
 class BotDefinition:
     def __init__(self, bot, room_id: str, api_token: str):
         self.bot = bot
-        room_id = "675f21fcecbfd6b18c0474f3"
+        room_id = "685fe9208ab075915779c70e"
         self.room_id = room_id
         self.api_token = api_token
 
 async def verify_reminder_task(bot_instance):
     """30 saniyede bir verify mesajı gönder"""
     while True:
-        await asyncio.sleep(30)
+        await asyncio.sleep(60)
         try:
-            await bot_instance.highrise.chat("⚠️ Ücretsiz bilet almak için bota özel mesaj atarak /verify yazın!")
+            await bot_instance.highrise.chat("⚠️ Ücretsiz bilet almak için bota özel mesaj atarak /verify yazın! (1 kez için geçerli)")
         except Exception as e:
             print(f"Verify mesajı gönderilirken hata: {e}")
 
 async def main():
-    room_id = "675f21fcecbfd6b18c0474f3"
+    room_id = "685fe9208ab075915779c70e"
     token = "de29bb353e3d2be63f50157cb3d6c857bfc6ab46bb21b53451d903e015f76831"    
     bot_instance = SEA()  
     bot_instance.room_id = room_id  # Bot instance'a room_id'yi aktar
