@@ -431,8 +431,7 @@ class SEA(BaseBot):
             try:
                 await self.highrise.send_whisper(user.id,"\nMEVCUT KOMUTLAR:\n/play <şarkı adı> veya /play <youtube url> - Şarkı çal.\n/next - Sıradaki şarkıyı göster.\n/skip - Mevcut şarkıyı geç.\n/skip [numara] - Sıradaki şarkıyı geç.")
                 await asyncio.sleep(3)
-                await self.highrise.send_whisper(user.id, "\n/top [numara] - Bir şarkıyı sıranın başına al\n"
-                                    "/now - Şu anda çalan şarkıyı göster\n"
+                await self.highrise.send_whisper(user.id, "\n/now - Şu anda çalan şarkıyı göster\n"
                                     "/dump [numara] - Sıradaki şarkı bilgisini al\n"
                                     "/wallet - Bilet bilginizi görün.\n"
                                     "/give @kullanıcı [numara] - Kullanıcıya bilet ver.")
@@ -448,7 +447,7 @@ class SEA(BaseBot):
             try:
                 await self.highrise.send_whisper(user.id,"\nADMİN KOMUTLARI:\n/add @kullanıcı - Kullanıcıyı sahiplere ekle\n/rem @kullanıcı - Kullanıcıyı sahiplerden kaldır\n/addv @kullanıcı - Kullanıcıyı VIP'e ekle\n/remv @kullanıcı - Kullanıcıyı VIP'ten kaldır")
                 await asyncio.sleep(3)
-                await self.highrise.send_whisper(user.id, "\n/give @kullanıcı [numara] - Kullanıcıya bilet ver\n/info @kullanıcı - Kullanıcının biletlerini kontrol et\n/top [numara] - Şarkıyı sıranın başına taşı\n/res [şarkı] - Bir şarkıyı yasakla\n/unres [şarkı] - Şarkı yasağını kaldır")
+                await self.highrise.send_whisper(user.id, "\n/give @kullanıcı [numara] - Kullanıcıya bilet ver\n/info @kullanıcı - Kullanıcının biletlerini kontrol et\n/res [şarkı] - Bir şarkıyı yasakla\n/unres [şarkı] - Şarkı yasağını kaldır")
                 await asyncio.sleep(1)
                 await self.highrise.send_whisper(user.id, "\n/promo [mesaj] - Promo mesajı ekle\n/rpromo [mesaj] - Promo mesajını kaldır\n/cpromo - Tüm promo mesajlarını temizle\n/msg @kullanıcı - Kullanıcıyı mesaj listesine ekle\n/rmsg @kullanıcı - Kullanıcıyı mesaj listesinden kaldır")
                 await asyncio.sleep(1)
@@ -601,23 +600,7 @@ class SEA(BaseBot):
                     print(f"Error in /next command: {e}") 
                     await self.highrise.send_whisper(user.id, "Sıra kontrol edilirken hata")
 
-        if message.startswith("/top") and user.username in ownerz:
-            try:
-                parts = message.split(" ")
-                if len(parts) > 1 and parts[1].isdigit():
-                    index = int(parts[1]) - 1  # Convert to 0-based index
-                    if 0 <= index < len(self.req_files):
-                        item_to_move = self.req_files[index]
-                        del self.req_files[index]
-                        self.req_files.appendleft(item_to_move)
-                        await self.highrise.chat(f"{get_ordinal(index + 1)} şarkı sıranın başına taşındı.")
-                    else:
-                        await self.highrise.send_whisper(user.id, f"Sırada {get_ordinal(index + 1)} numaralı şarkı bulunamadı.")
-                else:
-                    await self.highrise.send_whisper(user.id, "Geçersiz komut. /top komutunu sıradaki numara ile kullanın")
-            except Exception as e:
-                print(f"Error moving song to top: {e}")
-                await self.highrise.send_whisper(user.id, "Şarkı taşınırken hata oluştu.")
+        
 
         if message.startswith("/skip"):
             try:    
@@ -1431,9 +1414,9 @@ class SEA(BaseBot):
             minutes = int(length // 60)
             seconds = int(length % 60)
             return f"{minutes}:{seconds:02d}"
-        except Exception as e:
-            print(f"Error getting audio length for {audio_path}: {e}")
-            return None
+        except Exception:
+            # Return default length for invalid MP3 files without logging
+            return "0:30"
 
 def get_ordinal(n):
     if 10 <= n % 100 <= 20:
@@ -1498,7 +1481,7 @@ def start_streaming(bot_instance):
                             # Verify file still exists
                             if os.path.exists(bot_instance.req_files[0]['url']):
                                 audio_file = bot_instance.req_files[0]['url']
-                                print(f"Streaming from bot_instance.req_files: {bot_instance.req_files[0]['title']}")
+                                print(f"Streaming from queue: {bot_instance.req_files[0]['title']}")
                             else:
                                 print(f"Requested file missing: {bot_instance.req_files[0]['url']}")
                                 bot_instance.req_files.popleft()
@@ -1510,27 +1493,29 @@ def start_streaming(bot_instance):
                             if available_playlist:
                                 erm = random.choice(available_playlist)
                                 audio_file = erm['url']
-                                print(f"Streaming from fav: {erm['title']}")
+                                print(f"Streaming from playlist: {erm['title']}")
                         
-                        # Default to Nothing.mp3
+                        # Default to Nothing.mp3 when queue is empty
                         if audio_file is None:
                             audio_file = random.choice(AUDIO_FILES)
-                            print(f"Streaming default audio: {audio_file}")
+                            # Don't spam console when playing default audio
+                            # print(f"Streaming default audio: {audio_file}")
 
                         success = stream_audio(sock, audio_file, bot_instance)
                         
                         if bot_instance.skip:
                             bot_instance.skip = False
-                            print("Skip processed, continuing to next song...")
                             continue
                         
                         if not success:
-                            print("Stream interrupted, attempting reconnection...")
                             sock.close()
                             break
                         
-                        # Small delay between songs
-                        time.sleep(0.5)
+                        # Longer delay when playing default audio to reduce spam
+                        if audio_file in AUDIO_FILES:
+                            time.sleep(2)
+                        else:
+                            time.sleep(0.5)
 
                 except Exception as e:
                     print(f"Error during streaming: {e}")
@@ -1539,14 +1524,16 @@ def start_streaming(bot_instance):
             else:
                 print("Failed to connect to Icecast server.")
 
-            print("Reconnecting ...")
-            time.sleep(3)
+            time.sleep(5)
     except Exception as e:
         print(f"Error in start_streaming: {e}")
 
 def stream_audio(sock, audio_file, bot_instance):
     try:
-        print(f"Streaming audio file: {audio_file}")
+        # Only print for non-default audio files to reduce spam
+        if audio_file not in AUDIO_FILES:
+            print(f"Streaming audio file: {audio_file}")
+        
         # Clear current song info before setting a new one
         bot_instance.now.clear()
         bot_instance.message.clear()
@@ -1588,7 +1575,6 @@ def stream_audio(sock, audio_file, bot_instance):
             bot_instance.now.append(details)
             bot_instance.message.append(details)
 
-
         command = [
             './bin/ffmpeg',
             '-re',
@@ -1603,13 +1589,14 @@ def stream_audio(sock, audio_file, bot_instance):
             '-'
         ]
 
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
         
         while True:
             data = process.stdout.read(4096)
             
             if bot_instance.skip:
-                print(f"Skipping: {audio_file}")
+                if audio_file not in AUDIO_FILES:
+                    print(f"Skipping: {audio_file}")
                 process.terminate()
                 
                 # Remove from req_files if it was a requested song
@@ -1624,7 +1611,9 @@ def stream_audio(sock, audio_file, bot_instance):
                 
             if not data:
                 process.terminate()
-                print(f"Finished streaming: {audio_file}")
+                # Only print for non-default audio files to reduce spam
+                if audio_file not in AUDIO_FILES:
+                    print(f"Finished streaming: {audio_file}")
                 
                 # Clean up req_files when song finishes naturally
                 if bot_instance.req_files and bot_instance.req_files[0]['url'] == audio_file:
@@ -1644,7 +1633,6 @@ def stream_audio(sock, audio_file, bot_instance):
             except (BrokenPipeError, ConnectionResetError) as e:
                 print(f"Connection lost while sending chunk: {e}")
                 process.terminate()
-                # Don't remove from queue on connection error, so it can retry
                 return False # Indicate connection error
             time.sleep(0.05)
             
