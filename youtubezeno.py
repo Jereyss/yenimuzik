@@ -605,18 +605,19 @@ class SEA(BaseBot):
             try:
                 parts = message.split(" ")
                 if len(parts) > 1 and parts[1].isdigit():
-                    index = int(parts[1])
-                    if 0 < index < len(self.req_files):
+                    index = int(parts[1]) - 1  # Convert to 0-based index
+                    if 0 <= index < len(self.req_files):
                         item_to_move = self.req_files[index]
-                        self.req_files.remove(item_to_move)
-                        self.req_files.insert(1, item_to_move)
-                        await self.highrise.chat(f"{get_ordinal(index)} şarkı sıranın başına taşındı.")
+                        del self.req_files[index]
+                        self.req_files.appendleft(item_to_move)
+                        await self.highrise.chat(f"{get_ordinal(index + 1)} şarkı sıranın başına taşındı.")
                     else:
-                        await self.highrise.send_whisper(user.id, f"Sırada {get_ordinal(index)} numaralı şarkı bulunamadı.")
+                        await self.highrise.send_whisper(user.id, f"Sırada {get_ordinal(index + 1)} numaralı şarkı bulunamadı.")
                 else:
                     await self.highrise.send_whisper(user.id, "Geçersiz komut. /top komutunu sıradaki numara ile kullanın")
             except Exception as e:
                 print(f"Error moving song to top: {e}")
+                await self.highrise.send_whisper(user.id, "Şarkı taşınırken hata oluştu.")
 
         if message.startswith("/skip"):
             try:    
@@ -1490,17 +1491,31 @@ def start_streaming(bot_instance):
             if sock:
                 try:
                     while True:
+                        audio_file = None
+                        
+                        # Check for requested songs first
                         if bot_instance.req_files:
-                            audio_file = bot_instance.req_files[0]['url']
-                            print(f"Streaming from bot_instance.req_files: {bot_instance.req_files[0]['title']}")
+                            # Verify file still exists
+                            if os.path.exists(bot_instance.req_files[0]['url']):
+                                audio_file = bot_instance.req_files[0]['url']
+                                print(f"Streaming from bot_instance.req_files: {bot_instance.req_files[0]['title']}")
+                            else:
+                                print(f"Requested file missing: {bot_instance.req_files[0]['url']}")
+                                bot_instance.req_files.popleft()
+                                continue
+                        
+                        # Check playlist if no requests
                         elif playlist:
-                            random.shuffle(playlist)
-                            erm = random.choice(playlist)
-                            audio_file = erm['url']
-                            print(f"Streaming from fav: {erm['title']}")
-                        else:
-                            random.shuffle(AUDIO_FILES)
+                            available_playlist = [item for item in playlist if os.path.exists(item['url'])]
+                            if available_playlist:
+                                erm = random.choice(available_playlist)
+                                audio_file = erm['url']
+                                print(f"Streaming from fav: {erm['title']}")
+                        
+                        # Default to Nothing.mp3
+                        if audio_file is None:
                             audio_file = random.choice(AUDIO_FILES)
+                            print(f"Streaming default audio: {audio_file}")
 
                         success = stream_audio(sock, audio_file, bot_instance)
                         
@@ -1514,7 +1529,8 @@ def start_streaming(bot_instance):
                             sock.close()
                             break
                         
-                        # Song completed successfully, continue to next iteration
+                        # Small delay between songs
+                        time.sleep(0.5)
 
                 except Exception as e:
                     print(f"Error during streaming: {e}")
@@ -1535,27 +1551,34 @@ def stream_audio(sock, audio_file, bot_instance):
         bot_instance.now.clear()
         bot_instance.message.clear()
 
+        # Check if file exists first
+        if not os.path.exists(audio_file):
+            print(f"Audio file not found: {audio_file}")
+            return False
+
         if audio_file in AUDIO_FILES:
             song_title = audio_file.replace(".mp3", "")
             audio_length = bot_instance.get_audio_length(audio_file)
+            if audio_length is None:
+                audio_length = "0:00"
             bot_instance.now.append({'url': audio_file, 'title': song_title, 'user': None, 'audio_length': audio_length})
             # Nothing.mp3 için mesaj ekleme
             if song_title != "Nothing":
                 bot_instance.message.append({'url': audio_file, 'title': song_title, 'user': None, 'audio_length': audio_length})
 
-        elif playlist:
+        elif any(item['url'] == audio_file for item in playlist):
             matching_item = next((item for item in playlist if item['url'] == audio_file), None)
             if matching_item:
                 details = {
                     'url': matching_item['url'],
                     'title': matching_item['title'],
                     'user': None,
-                    'audio_length': matching_item['audio_length']
+                    'audio_length': matching_item.get('audio_length', matching_item.get('duration', '0:00'))
                 }
                 bot_instance.now.append(details)
                 bot_instance.message.append(details)
 
-        if bot_instance.req_files and audio_file == bot_instance.req_files[0]['url']:
+        elif bot_instance.req_files and audio_file == bot_instance.req_files[0]['url']:
             details = {
                 'url': bot_instance.req_files[0]['url'],
                 'title': bot_instance.req_files[0]['title'],
@@ -1629,7 +1652,7 @@ def stream_audio(sock, audio_file, bot_instance):
         print(f"Streaming error: {e}")
         return False # Indicate streaming error
 
-def cleanup_temp_file(self, temp_file_path):
+def cleanup_temp_file(bot_instance, temp_file_path):
     """Remove the temporary file from memory."""
     try:
         if os.path.exists(temp_file_path):
