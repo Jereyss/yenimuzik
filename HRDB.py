@@ -16,7 +16,7 @@ data_mappings = {
 
 globals().update(data_mappings)
 
-edef save_data():
+def save_data():
     """Save all data to corresponding JSON files."""
     total, used, free = shutil.disk_usage("/")
     if free < 1024 * 1024:
