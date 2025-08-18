@@ -1533,7 +1533,7 @@ def stream_audio(sock, audio_file, bot_instance):
 
 
         command = [
-            'ffmpeg',
+            './bin/ffmpeg',
             '-re',
             '-i', audio_file,
             '-map', '0:a',
