@@ -32,7 +32,7 @@ from HRDB import ownerz, playlist, user_ticket, vip_users, msg, restrict, promo,
 
 invite = "675f21fcecbfd6b18c0474f3"
 
-# Icecast server configuration - Zeno.fm ayarları
+# Icecast server configuration - Zeno.fm settings
 SERVER_HOST = "link.zeno.fm" # dont change.
 SERVER_PORT = 80 # dont change
 MOUNT_POINT = "/wrmddxrooeyvv" # mount point from your settings
@@ -50,11 +50,7 @@ if not os.path.exists("Nothing.mp3"):
     with open("Nothing.mp3", "w") as f:
         f.write("# Placeholder audio file - replace with actual MP3")
 
-class BotDefinition:
-    def __init__(self, bot: BaseBot, room_id: str, api_token: str):
-        self.bot = bot
-        self.room_id = room_id
-        self.api_token = api_token
+# BotDefinition imported from highrise
 
 class SEA(BaseBot):
     def __init__(self):
@@ -84,7 +80,7 @@ class SEA(BaseBot):
         self.dance_loop_running = False
 
     def count_user_songs_in_queue(self, username):
-        """Kullanıcının kuyruktaki şarkı sayısını hesapla"""
+        """Calculate user's song count in queue"""
         count = 0
         for song in self.req_files:
             if song.get('user') == username:
@@ -214,12 +210,12 @@ class SEA(BaseBot):
                 if joined_at <= one_month_ago:
                     if not username in user_ticket:
                         user_ticket[username] = 3
-                        await self.highrise.send_message(conversation_id, "Hesabınız doğrulandı.")
-                        await self.highrise.send_message(conversation_id, "3 ücretsiz bilet aldınız!")
+                        await self.highrise.send_message(conversation_id, "Your account has been verified.")
+                        await self.highrise.send_message(conversation_id, "You received 3 free tickets!")
                         if not user_id in ids:
                             ids.append(user_id)
                 else:
-                    await self.highrise.send_message(conversation_id, "Hesabınız en az 30 gün eski olmalı.")
+                    await self.highrise.send_message(conversation_id, "Your account must be at least 30 days old.")
         except Exception as e:
             print(e)
 
@@ -229,17 +225,17 @@ class SEA(BaseBot):
 
     async def invite_all(self, user):
         if not user.username in ownerz:
-            await self.highrise.send_whisper(user.id, "Bu komutu kullanamazsınız.")
+            await self.highrise.send_whisper(user.id, "You cannot use this command.")
             return
         try:
-            # Room ID'yi otomatik al
+            # Automatically get Room ID
             invite_room = self.room_id if self.room_id else "675f21fcecbfd6b18c0474f3"
             for erm in ids:
                 message_id = f"1_on_1:{erm}:{self.bot_id}"
                 await self.highrise.send_message(
                     message_id,
                     message_type="invite",
-                    content="Bu odaya katıl!", 
+                    content="Join this room!", 
                     room_id=invite_room)
                 await asyncio.sleep(3)
         except Exception as e:
@@ -253,14 +249,14 @@ class SEA(BaseBot):
                 try:
                     outfit_item.active_palette = color_palette
                 except:
-                    await self.highrise.chat(f"Bot '{category}' kategorisinden herhangi bir eşya kullanmıyor.")
+                    await self.highrise.chat(f"Bot is not wearing any items from '{category}' category.")
                     return
         await self.highrise.set_outfit(outfit)
 
     async def equip(self, item_name: str):
         items = (await self.webapi.get_items(item_name=item_name)).items
         if not items:
-            await self.highrise.chat(f"'{item_name}' eşyası bulunamadı.")
+            await self.highrise.chat(f"Item '{item_name}' not found.")
             return
 
         item = items[0]
@@ -273,17 +269,17 @@ class SEA(BaseBot):
             if item.rarity == Rarity.NONE:
                 pass
             elif not item.is_purchasable:
-                await self.highrise.chat(f"'{item_name}' eşyası satın alınamaz.")
+                await self.highrise.chat(f"Item '{item_name}' cannot be purchased.")
                 return
             else:
                 try:
                     response = await self.highrise.buy_item(item_id)
                     if response != "success":
-                        await self.highrise.chat(f"'{item_name}' eşyası satın alınamadı.")
+                        await self.highrise.chat(f"Failed to purchase item '{item_name}'.")
                         return
-                    await self.highrise.chat(f"'{item_name}' eşyası satın alındı.")
+                    await self.highrise.chat(f"Item '{item_name}' purchased successfully.")
                 except Exception as e:
-                    await self.highrise.chat(f"'{item_name}' satın alınırken hata: {e}")
+                    await self.highrise.chat(f"Error purchasing '{item_name}': {e}")
                     return
 
         new_item = Item(
@@ -336,7 +332,7 @@ class SEA(BaseBot):
                     _, category = parts
                     await self.remove(category)
                 else:
-                    await self.highrise.send_whisper(user.id, "Geçersiz format. Kullanım: /remove [eşya_adı]")
+                    await self.highrise.send_whisper(user.id, "Invalid format. Usage: /remove [item_name]")
             except:
                 pass
 
@@ -349,7 +345,7 @@ class SEA(BaseBot):
                     item_name = message.split(maxsplit=1)[1].strip()  # Get everything after /equip
                     await self.equip(item_name)
                 else:
-                    await self.highrise.send_whisper(user.id, "Geçersiz format. Kullanım: /equip [eşya_adı]")
+                    await self.highrise.send_whisper(user.id, "Invalid format. Usage: /equip [item_name]")
             except:
                 pass
 
@@ -363,9 +359,9 @@ class SEA(BaseBot):
                     color_palette = int(color_palette)  # Convert to integer
                     await self.color(category, color_palette)
                 except ValueError:
-                    await self.highrise.send_whisper(user.id, "Renk paleti bir sayı olmalıdır.")
+                    await self.highrise.send_whisper(user.id, "Color palette must be a number.")
             else:
-                await self.highrise.send_whisper(user.id, "Geçersiz format. Kullanım: /color [kategori] [palet_numarası]")
+                await self.highrise.send_whisper(user.id, "Invalid format. Usage: /color [category] [palette_number]")
 
         if message.startswith("/invite"):
             try:
@@ -378,14 +374,14 @@ class SEA(BaseBot):
                     try:
                         if not user.username in self.wait:
                             self.wait.append(user.username)
-                            await self.highrise.send_whisper(user.id, "Değişiklikleri uygulamak için 'yes' veya 'no' yazın.")
-                            await self.highrise.send_whisper(user.id, "10 saniye içinde 'yes' veya 'no' ile cevap vermezseniz işlem iptal edilir.")
+                            await self.highrise.send_whisper(user.id, "Type 'yes' or 'no' to apply changes.")
+                            await self.highrise.send_whisper(user.id, "If you don't respond with 'yes' or 'no' within 10 seconds, the operation will be canceled.")
                         await asyncio.sleep(10)
                         if user.username in self.choices:
                             del self.choices[user.username]
                             if user.username in self.wait:
                                 self.wait.remove(user.username)
-                            await self.highrise.send_whisper(user.id, "İşlem iptal edildi.")
+                            await self.highrise.send_whisper(user.id, "Operation canceled.")
                     except:
                         pass
 
@@ -400,29 +396,29 @@ class SEA(BaseBot):
                 if user.username in self.choices:
                     new_bitrate = self.choices[user.username]
                     self.bitrate = new_bitrate
-                    await self.highrise.chat(f"Ses bit hızı başarıyla {new_bitrate} olarak güncellendi.")
+                    await self.highrise.chat(f"Audio bitrate successfully updated to {new_bitrate}.")
                     del self.choices[user.username]
 
         if message.startswith("/cbit") and (user.username == "Atknz" or user.username in ownerz):
-            await self.highrise.send_whisper(user.id, f"Şu anda ses {self.bitrate}bps hızında yayınlanıyor.")
+            await self.highrise.send_whisper(user.id, f"Currently streaming audio at {self.bitrate}bps.")
 
         if message.startswith("/bitrate ") and (user.username == "Atknz" or user.username in ownerz):
             parts = message.split(" ")
             if len(parts) > 1:
                 if parts[1].endswith("k") and parts[1][:-1].isdigit():
                     bitrate = parts[1]
-                    await self.highrise.chat(f"Ses bit hızını {bitrate} olarak değiştirmek istediğinizden emin misiniz?")
-                    await self.highrise.send_whisper(user.id, "Bu ses akışını etkileyebilir.\n"
-"Onaylamak için 'yes', iptal etmek için 'no' yazın.")
+                    await self.highrise.chat(f"Are you sure you want to change audio bitrate to {bitrate}?")
+                    await self.highrise.send_whisper(user.id, "This may affect the audio stream.\n"
+"Type 'yes' to confirm, 'no' to cancel.")
                     self.choices[user.username] = bitrate
                 else:
-                    await self.highrise.send_whisper(user.id, "Geçersiz komut, kullanım: /bitrate [sayı]k\nÖrnek: /bitrate 256k")
+                    await self.highrise.send_whisper(user.id, "Invalid command, usage: /bitrate [number]k\nExample: /bitrate 256k")
             else:
-                await self.highrise.send_whisper(user.id, "Geçersiz komut, kullanım: /bitrate [sayı]k\nÖrnek: /bitrate 128k")
+                await self.highrise.send_whisper(user.id, "Invalid command, usage: /bitrate [number]k\nExample: /bitrate 128k")
 
         if message == "/restart" and (user.username == "Atknz" or user.username in ownerz):
             try:
-                await self.highrise.send_whisper(user.id, "Bot yeniden başlatılıyor...")
+                await self.highrise.send_whisper(user.id, "Bot is restarting...")
                 await self.restart_bot()
             except Exception as e:
                 print("Error in /restart command: ", e)
@@ -436,16 +432,16 @@ class SEA(BaseBot):
                                     "/wallet - View your ticket balance.\n"
                                     "/give @user [number] - Give tickets to user.")
                 await asyncio.sleep(1)
-                await self.highrise.send_whisper(user.id, "\n/rlist - Bilet fiyat listesini görün.\n/info @kullanıcı - Kullanıcının bilet bilgisini al.\n/fav - Favori çalma listesine ekle.\n/rfav [numara] favori çalma listesinden kaldır.\n/flist - Favori çalma listesini göster.")
+                await self.highrise.send_whisper(user.id, "\n/rlist - View ticket price list.\n/info @user - Get user's ticket information.\n/fav - Add to favorite playlist.\n/rfav [number] - Remove from favorite playlist.\n/flist - Show favorite playlist."))
                 await asyncio.sleep(1)
-                await self.highrise.send_whisper(user.id, "\n/cfav - Favori çalma listesini temizle.\n/transfer @kullanıcı [numara] - Biletlerinizi kullanıcıya transfer et (min 6 bilet)") 
+                await self.highrise.send_whisper(user.id, "\n/cfav - Clear favorite playlist.\n/transfer @user [number] - Transfer your tickets to user (min 6 tickets)") 
                 return
             except:
                 pass
 
         if message.startswith("/ahelp") and user.username in ownerz:
             try:
-                await self.highrise.send_whisper(user.id,"\nADMİN KOMUTLARI:\n/add @kullanıcı - Kullanıcıyı sahiplere ekle\n/rem @kullanıcı - Kullanıcıyı sahiplerden kaldır\n/addv @kullanıcı - Kullanıcıyı VIP'e ekle\n/remv @kullanıcı - Kullanıcıyı VIP'ten kaldır")
+                await self.highrise.send_whisper(user.id,"\nADMIN COMMANDS:\n/add @user - Add user to owners\n/rem @user - Remove user from owners\n/addv @user - Add user to VIP\n/remv @user - Remove user from VIP")
                 await asyncio.sleep(3)
                 await self.highrise.send_whisper(user.id, "\n/give @kullanıcı [numara] - Kullanıcıya bilet ver\n/info @kullanıcı - Kullanıcının biletlerini kontrol et\n/res [şarkı] - Bir şarkıyı yasakla\n/unres [şarkı] - Şarkı yasağını kaldır")
                 await asyncio.sleep(1)
