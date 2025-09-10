@@ -20,7 +20,7 @@ localPort = 8080
 externalPort = 80
 
 [workflows]
-runButton = "Music Bot"
+runButton = "Project"
 
 [[workflows.workflow]]
 name = "Music Bot"
@@ -30,6 +30,18 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python run.py"
+
+[[workflows.workflow]]
+name = "Music Bot"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python run.py"
+
+[workflows.workflow.metadata]
+outputType = "console"
 
 [agent]
 expertMode = true

@@ -429,12 +429,12 @@ class SEA(BaseBot):
 
         if message.startswith("/help"):
             try:
-                await self.highrise.send_whisper(user.id,"\nMEVCUT KOMUTLAR:\n/play <şarkı adı> veya /play <youtube url> - Şarkı çal.\n/next - Sıradaki şarkıyı göster.\n/skip - Mevcut şarkıyı geç.\n/skip [numara] - Sıradaki şarkıyı geç.")
+                await self.highrise.send_whisper(user.id,"\nAVAILABLE COMMANDS:\n/play <song name> or /play <youtube url> - Play song.\n/next - Show next song.\n/skip - Skip current song.\n/skip [number] - Skip song in queue.")
                 await asyncio.sleep(3)
-                await self.highrise.send_whisper(user.id, "\n/now - Şu anda çalan şarkıyı göster\n"
-                                    "/dump [numara] - Sıradaki şarkı bilgisini al\n"
-                                    "/wallet - Bilet bilginizi görün.\n"
-                                    "/give @kullanıcı [numara] - Kullanıcıya bilet ver.")
+                await self.highrise.send_whisper(user.id, "\n/now - Show currently playing song\n"
+                                    "/dump [number] - Get song info from queue\n"
+                                    "/wallet - View your ticket balance.\n"
+                                    "/give @user [number] - Give tickets to user.")
                 await asyncio.sleep(1)
                 await self.highrise.send_whisper(user.id, "\n/rlist - Bilet fiyat listesini görün.\n/info @kullanıcı - Kullanıcının bilet bilgisini al.\n/fav - Favori çalma listesine ekle.\n/rfav [numara] favori çalma listesinden kaldır.\n/flist - Favori çalma listesini göster.")
                 await asyncio.sleep(1)
@@ -472,12 +472,12 @@ class SEA(BaseBot):
                     elif user.username in vip_users:
                         # VIPler için maksimum 2 şarkı
                         if user_songs_count >= 2:
-                            await self.highrise.send_whisper(user.id, "VIP kullanıcılar aynı anda maksimum 2 şarkı açabilir. Mevcut şarkınız çalana kadar bekleyin.")
+                            await self.highrise.send_whisper(user.id, "VIP users can play maximum 2 songs simultaneously. Wait until your current song finishes.")
                             return
                     else:
                         # Normal kullanıcılar için maksimum 1 şarkı
                         if user_songs_count >= 1:
-                            await self.highrise.send_whisper(user.id, "Aynı anda sadece 1 şarkı açabilirsiniz. Mevcut şarkınız çalana kadar bekleyin.")
+                            await self.highrise.send_whisper(user.id, "You can only play 1 song at a time. Wait until your current song finishes.")
                             return
                     
                     query = message.split(" ", 1)[1]
@@ -549,38 +549,38 @@ class SEA(BaseBot):
                 await self.highrise.send_whisper(user.id, "Geçersiz indeks formatı. /dump komutundan sonra geçerli bir numara verin.")
             except Exception as e:
                 print(f"Error in /dump command: {e}")
-                await self.highrise.send_whisper(user.id, "İstek işlenirken hata oluştu.")
+                await self.highrise.send_whisper(user.id, "Error occurred while processing request.")
 
         if message.startswith("/now"):
             try:
                 if not self.now:
-                    await self.highrise.send_whisper(user.id, "Şu anda hiçbir şey çalmıyor.")
+                    await self.highrise.send_whisper(user.id, "Nothing is currently playing.")
                     return
                     
                 now_playing = self.now[0]
                 now = self.now[0]['title']
                 if self.now[0]['user']:
-                    await self.highrise.send_whisper(user.id, f"🎵 Şu anda çalıyor: {now}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {self.now[0]['audio_length']}\n (@{now_playing['user']} tarafından istendi)")
+                    await self.highrise.send_whisper(user.id, f"🎵 Now playing: {now}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {self.now[0]['audio_length']}\n (@{now_playing['user']} requested)")
                 else:
-                    await self.highrise.send_whisper(user.id, f"🎵 Şu anda çalıyor: {now}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {self.now[0]['audio_length']}")
+                    await self.highrise.send_whisper(user.id, f"🎵 Now playing: {now}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {self.now[0]['audio_length']}")
             except IndexError:
-                await self.highrise.send_whisper(user.id, "Şu anda hiçbir şey çalmıyor.")
+                await self.highrise.send_whisper(user.id, "Nothing is currently playing.")
             except Exception as e:
                 print(f"Error in /now command: {e}")
-                await self.highrise.send_whisper(user.id, "İstek işlenirken hata oluştu.")
+                await self.highrise.send_whisper(user.id, "Error occurred while processing request.")
 
         if message.startswith("/wallet"):
             try:
                 if user.username in user_ticket:
                     if user_ticket[user.username] == 0:
-                        await self.highrise.send_whisper(user.id, f"Cüzdanınızda hiç bilet kalmadı. Bilet almak için @{self.username}'a bahşiş verin.")
+                        await self.highrise.send_whisper(user.id, f"No tickets left in your wallet. Tip @{self.username} to get tickets.")
                         return
                     if user_ticket[user.username] == 1:
-                        await self.highrise.send_whisper(user.id, f"Cüzdanınızda sadece {user_ticket[user.username]} bilet kaldı.")
+                        await self.highrise.send_whisper(user.id, f"Only {user_ticket[user.username]} ticket left in your wallet.")
                         return
-                    await self.highrise.send_whisper(user.id, f"Cüzdanınızda toplam: {user_ticket[user.username]} bilet var.")
+                    await self.highrise.send_whisper(user.id, f"Total tickets in your wallet: {user_ticket[user.username]}.")
                 else:
-                    await self.highrise.send_whisper(user.id, "3 ücretsiz bilet almak için bu bota özel mesaj atın.")
+                    await self.highrise.send_whisper(user.id, "Send a private message to this bot to get 3 free tickets.")
             except Exception as e:
                 print("The error occurred in wallet:", e)
 
@@ -591,14 +591,14 @@ class SEA(BaseBot):
                     audio_length = (next_file['duration'])
                     next = next_file['title']
                     if next_file['user']:
-                        await self.highrise.send_whisper(user.id, f"🎵 Sıradaki şarkı: {next}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {audio_length}\n (@{next_file['user']} tarafından istendi)")
+                        await self.highrise.send_whisper(user.id, f"🎵 Next song: {next}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {audio_length}\n (@{next_file['user']} requested)")
                     else:
-                        await self.highrise.send_whisper(user.id, f"🎵 Sıradaki şarkı: {next}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {audio_length}")
+                        await self.highrise.send_whisper(user.id, f"🎵 Next song: {next}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {audio_length}")
                 else: 
-                    await self.highrise.send_whisper(user.id, "Sırada başka şarkı yok")
+                    await self.highrise.send_whisper(user.id, "No more songs in queue")
             except Exception as e: 
                     print(f"Error in /next command: {e}") 
-                    await self.highrise.send_whisper(user.id, "Sıra kontrol edilirken hata")
+                    await self.highrise.send_whisper(user.id, "Error checking queue")
 
         
 
@@ -631,7 +631,7 @@ class SEA(BaseBot):
                         await self.highrise.send_whisper(user.id, f"Sırada {get_ordinal(index + 1)} numaralı şarkı bulunamadı.") 
                 else:
                     if not self.now:
-                        await self.highrise.send_whisper(user.id, "Şu anda hiçbir şey çalmıyor.")
+                        await self.highrise.send_whisper(user.id, "Nothing is currently playing.")
                         return
                     rem_length = self.now[0]['audio_length']
                     removed_file = self.now[0]
