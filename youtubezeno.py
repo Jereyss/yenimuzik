@@ -459,19 +459,19 @@ class SEA(BaseBot):
         if message.startswith("/play"):
             if (user.username in vip_users) or (user.username in user_ticket and user_ticket[user.username] > 0) or (user.username in ownerz):
                 try:
-                    # Şarkı sınırlaması kontrolü
+                    # Song limit check
                     user_songs_count = self.count_user_songs_in_queue(user.username)
                     
                     if user.username in ownerz:
                         # Ownerlar için sınırsız
                         pass
                     elif user.username in vip_users:
-                        # VIPler için maksimum 2 şarkı
+                        # Maximum 2 songs for VIPs
                         if user_songs_count >= 2:
                             await self.highrise.send_whisper(user.id, "VIP users can play maximum 2 songs simultaneously. Wait until your current song finishes.")
                             return
                     else:
-                        # Normal kullanıcılar için maksimum 1 şarkı
+                        # Maximum 1 song for normal users
                         if user_songs_count >= 1:
                             await self.highrise.send_whisper(user.id, "You can only play 1 song at a time. Wait until your current song finishes.")
                             return
@@ -480,11 +480,11 @@ class SEA(BaseBot):
                     lower_query = query.lower()
                     for item in restrict:
                         if item.lower() in lower_query:
-                            await self.highrise.send_whisper(user.id, "Bu şarkı yasaklı. Biletiniz iade edildi.")
+                            await self.highrise.send_whisper(user.id, "This song is banned. Your ticket has been refunded.")
                             return
                     if query.startswith("https://"):
                         if "playlist" not in query:
-                            await self.highrise.send_whisper(user.id, "Linkler şu an desteklenmiyor, şarkı - sanatçı olarak ekleyin.")
+                            await self.highrise.send_whisper(user.id, "Links are not currently supported, add as song - artist.")
                             return
                             await self.highrise.send_whisper(user.id, "İsteğiniz işleniyor. Sabırlı olun.")
                             if user.username in user_ticket:
@@ -501,11 +501,11 @@ class SEA(BaseBot):
                             await self.highrise.send_whisper(user.id, "• Not: İstekler 1 bilet maliyetindedir. Biletlerinizi boşa harcamayın. İstediğiniz şarkı bulunamazsa biletiniz cüzdanınıza iade edilir.")
                         await self.add_to_queue(query, user)
                 except IndexError:
-                    await self.highrise.send_whisper(user.id, "/play komutundan sonra bir şarkı adı belirtin.")
+                    await self.highrise.send_whisper(user.id, "Please specify a song name after /play command.")
                 except Exception as e:
                     print(f"Error in chat command: {e}")
             else:
-                await self.highrise.send_whisper(user.id, "Yeterli biletiniz yok.")
+                await self.highrise.send_whisper(user.id, "You don't have enough tickets.")
                 await asyncio.sleep(3)
                 await self.highrise.send_whisper(user.id, "Fiyat listesini görmek için /rlist yazın.")
 
@@ -616,7 +616,7 @@ class SEA(BaseBot):
                         req_user = self.req_files[adjusted_index]['user']
                         fix_rem = removed_file['title']
                         if not (user.username in ownerz or user.username == req_user):
-                            await self.highrise.send_whisper(user.id, "NOT: Sadece istediğiniz şarkıyı geçebilirsiniz.")
+                            await self.highrise.send_whisper(user.id, "NOTE: You can only skip songs you requested.")
                             return
                         if os.path.exists(self.req_files[adjusted_index]['url']):
                             os.remove(self.req_files[adjusted_index]['url'])
