@@ -432,7 +432,7 @@ class SEA(BaseBot):
                                     "/wallet - View your ticket balance.\n"
                                     "/give @user [number] - Give tickets to user.")
                 await asyncio.sleep(1)
-                await self.highrise.send_whisper(user.id, "\n/rlist - View ticket price list.\n/info @user - Get user's ticket information.\n/fav - Add to favorite playlist.\n/rfav [number] - Remove from favorite playlist.\n/flist - Show favorite playlist."))
+                await self.highrise.send_whisper(user.id, "\n/rlist - View ticket price list.\n/info @user - Get user's ticket information.\n/fav - Add to favorite playlist.\n/rfav [number] - Remove from favorite playlist.\n/flist - Show favorite playlist.")
                 await asyncio.sleep(1)
                 await self.highrise.send_whisper(user.id, "\n/cfav - Clear favorite playlist.\n/transfer @user [number] - Transfer your tickets to user (min 6 tickets)") 
                 return
