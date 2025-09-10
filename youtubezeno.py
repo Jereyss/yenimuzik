@@ -32,6 +32,142 @@ from HRDB import ownerz, playlist, user_ticket, vip_users, msg, restrict, promo,
 
 invite = "675f21fcecbfd6b18c0474f3"
 
+# Language system
+BOT_LANGUAGE = "tr"  # Default language: Turkish
+
+MESSAGES = {
+    "tr": {
+        # Play command messages
+        "song_processing": "İsteğiniz işleniyor. Sabırlı olun.",
+        "ticket_cost_note": "• Not: İstekler 1 bilet tutar. Biletlerinizi boşa harcamayın. İstediğiniz şarkı bulunamazsa biletiniz iade edilecektir.",
+        "song_added": "🎵 {title}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• ({duration}) sıraya eklendi\n (@{user} tarafından istendi)",
+        "song_failed": "Şarkınız eklenemedi. Zaten sırada olan şarkıyı tekrar istememek ve 8 dakikadan uzun şarkı istememek için dikkat edin.",
+        "ticket_refunded": "Biletiniz cüzdanınıza iade edildi. Tekrar deneyin.",
+        "song_already_queued": "Şarkı zaten sırada.",
+        "no_tickets": "Yeterli biletiniz yok.",
+        "check_prices": "Fiyat listesini görmek için /rlist yazın.",
+        "vip_limit": "VIP kullanıcılar maksimum 2 şarkıyı aynı anda çalabilir. Mevcut şarkınız bitene kadar bekleyin.",
+        "user_limit": "Aynı anda sadece 1 şarkı çalabilirsiniz. Mevcut şarkınız bitene kadar bekleyin.",
+        "song_banned": "Bu şarkı yasaklandı. Biletiniz iade edildi.",
+        "specify_song": "Lütfen /play komutundan sonra bir şarkı adı belirtin.",
+        "links_not_supported": "Linkler şu anda desteklenmiyor, şarkı - sanatçı olarak ekleyin.",
+        "no_playlists": "\n Playlist ekleyemezsiniz. Tek seferde bir şarkı isteyin",
+        
+        # Wallet and tickets
+        "remaining_tickets": "Cüzdanınızda kalan bilet: {tickets}",
+        "total_tickets": "Cüzdanınızdaki toplam bilet: {tickets}",
+        "wallet_updated_5g": "{username}'ın cüzdanı 5g bahşiş için 2 bilet ile güncellendi.",
+        "wallet_updated_10g": "{username}'ın cüzdanı 10g bahşiş için 3 bilet ile güncellendi.",
+        "wallet_updated": "{username}'ın cüzdanı {amount}g bahşiş için {tickets} bilet ile güncellendi.",
+        "bot_wallet": "Efendim, mevcut bakiyem {gold} altın!",
+        "no_access": "Bu komuta erişiminiz yok",
+        "min_tip_5g": "Bilet almak için en az 5g bahşiş verin.",
+        "already_vip": "Zaten VIP'siniz, bilete ihtiyacınız yok.",
+        "vip_extended": "VIP döneminiz uzatıldı. Altın bahşiş için teşekkürler. <3",
+        "vip_added": "VIP kullanıcılara eklendiniz. Hata yaşarsanız @Atknz'ye mesaj atın. Keyfini çıkarın <3",
+        "vip_note": "\n*NOT*: VIP'iniz {date} tarihinden başladı, gelecek ayın {day}'ından önce VIP'inizi yenilediğinizden emin olun.",
+        
+        # Bot status and info
+        "now_playing": "🎵 Şu anda çalıyor: {title}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {duration}\n (@{user} tarafından istendi)",
+        "now_playing_no_user": "🎵 Şu anda çalıyor: {title}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {duration}",
+        "no_requests": "Şarkı isteği kalmadı. Şarkı istemek için /play yazın.",
+        "bot_position_set": "Bot konumu şuna ayarlandı: {location}",
+        "promo_cleared": "Promo listesi temizlendi.",
+        "promo_empty": "Promo listesi zaten boş.",
+        "operation_cancelled": "İşlem iptal edildi.",
+        "bitrate_updated": "Ses bit hızı başarıyla {bitrate} olarak güncellendi.",
+        "current_bitrate": "Şu anda {bitrate}bps'de ses akışı yapılıyor.",
+        "bitrate_confirm": "{bitrate}'ye değiştirmek istediğinizden emin misiniz?",
+        "bitrate_warning": "Bu ses akışını etkileyebilir.\n'yes' onaylamak, 'no' iptal etmek için yazın.",
+        "invalid_bitrate": "Geçersiz komut, kullanım: /bitrate [sayı]k\nÖrnek: /bitrate 256k",
+        "bot_restarting": "Bot yeniden başlatılıyor...",
+        
+        # Welcome messages
+        "welcome_new": "Odaya hoş geldiniz <3.\nÜcretsiz bilet almak için bu bota /verify yazın. Her şarkı isteği 1 bilet tutar.",
+        "welcome_commands": "/play 'şarkı' yazarak şarkı isteyebilirsiniz. Tüm komutlar için /help yazın.",
+        "welcome_support": "Bot arızalanırsa @Atknz'ye mesaj atın",
+        "welcome_back": "Odaya tekrar hoş geldiniz <3.\nBilet bilginizi kontrol etmek için /wallet yazın. Tüm komutlar için /help yazın.",
+        "welcome_old_account": "Odaya hoş geldiniz <3.\nBu bir müzik botu. Fiyat listesi için /rlist, bilet bilginizi kontrol etmek için /wallet, şarkı istemek için /play yazın.",
+        "account_verified": "Hesabınız doğrulandı.",
+        "free_tickets": "3 ücretsiz bilet aldınız!",
+        "account_too_new": "Hesabınız en az 30 günlük olmalı.",
+        
+        # Error and misc messages
+        "error_occurred": "Hata oluştu: {error}. Lütfen @Atknz'yi bilgilendirin",
+        "cannot_use_command": "Bu komutu kullanamazsınız.",
+        "invalid_format": "Geçersiz format. Kullanım: {usage}",
+        "language_changed": "Bot dili Türkçe olarak değiştirildi.",
+        "only_owner_command": "Bu komut sadece bot sahibi tarafından kullanılabilir."
+    },
+    "eng": {
+        # Play command messages
+        "song_processing": "Your request is being processed. Please be patient.",
+        "ticket_cost_note": "• Note: Requests cost 1 ticket. Don't waste your tickets. If your requested song is not found, your ticket will be refunded.",
+        "song_added": "🎵 {title}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• ({duration}) added to queue\n (requested by @{user})",
+        "song_failed": "Your song could not be added. Please avoid requesting songs already in queue and songs longer than 8 minutes.",
+        "ticket_refunded": "Your ticket has been refunded to your wallet. Please try again.",
+        "song_already_queued": "Song is already in queue.",
+        "no_tickets": "You don't have enough tickets.",
+        "check_prices": "Type /rlist to see price list.",
+        "vip_limit": "VIP users can play maximum 2 songs simultaneously. Wait until your current song finishes.",
+        "user_limit": "You can only play 1 song at a time. Wait until your current song finishes.",
+        "song_banned": "This song is banned. Your ticket has been refunded.",
+        "specify_song": "Please specify a song name after /play command.",
+        "links_not_supported": "Links are not currently supported, add as song - artist.",
+        "no_playlists": "\n You cannot add playlists. Request one song at a time",
+        
+        # Wallet and tickets
+        "remaining_tickets": "Tickets remaining in your wallet: {tickets}",
+        "total_tickets": "Total tickets in your wallet: {tickets}",
+        "wallet_updated_5g": "{username}'s wallet updated with 2 tickets for 5g tip.",
+        "wallet_updated_10g": "{username}'s wallet updated with 3 tickets for 10g tip.",
+        "wallet_updated": "{username}'s wallet updated with {tickets} tickets for {amount}g tip.",
+        "bot_wallet": "Sir, my current balance is {gold} gold!",
+        "no_access": "You cannot access this command",
+        "min_tip_5g": "Give at least 5g tip to buy tickets.",
+        "already_vip": "You are already VIP, you don't need tickets.",
+        "vip_extended": "Your VIP period has been extended. Thanks for the gold tip. <3",
+        "vip_added": "You have been added to VIP users. If you experience any issues, message @Atknz. Enjoy <3",
+        "vip_note": "\n*NOTE*: Your VIP started on {date}, make sure to renew your VIP before the {day} of next month.",
+        
+        # Bot status and info
+        "now_playing": "🎵 Now playing: {title}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {duration}\n (requested by @{user})",
+        "now_playing_no_user": "🎵 Now playing: {title}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {duration}",
+        "no_requests": "No song requests left. Type /play to request a song.",
+        "bot_position_set": "Bot position set to: {location}",
+        "promo_cleared": "Promo list cleared.",
+        "promo_empty": "Promo list is already empty.",
+        "operation_cancelled": "Operation cancelled.",
+        "bitrate_updated": "Audio bitrate successfully updated to {bitrate}.",
+        "current_bitrate": "Currently streaming audio at {bitrate}bps.",
+        "bitrate_confirm": "Are you sure you want to change audio bitrate to {bitrate}?",
+        "bitrate_warning": "This may affect the audio stream.\nType 'yes' to confirm, 'no' to cancel.",
+        "invalid_bitrate": "Invalid command, usage: /bitrate [number]k\nExample: /bitrate 256k",
+        "bot_restarting": "Bot is restarting...",
+        
+        # Welcome messages
+        "welcome_new": "Welcome to the room <3.\nType /verify to this bot to get free tickets. Each song request costs 1 ticket.",
+        "welcome_commands": "Type /play 'song' to request a song. Type /help for all commands.",
+        "welcome_support": "If the bot malfunctions, message @Atknz",
+        "welcome_back": "Welcome back to the room <3.\nType /wallet to check your ticket info. Type /help for all commands.",
+        "welcome_old_account": "Welcome to the room <3.\nThis is a music bot. Type /rlist for price list, each song request costs 1 ticket. Type /wallet to check your ticket info. Type /play to request a song.",
+        "account_verified": "Your account has been verified.",
+        "free_tickets": "You received 3 free tickets!",
+        "account_too_new": "Your account must be at least 30 days old.",
+        
+        # Error and misc messages
+        "error_occurred": "Error occurred: {error}. Please inform @Atknz",
+        "cannot_use_command": "You cannot use this command.",
+        "invalid_format": "Invalid format. Usage: {usage}",
+        "language_changed": "Bot language changed to English.",
+        "only_owner_command": "This command can only be used by the bot owner."
+    }
+}
+
+def get_message(key, **kwargs):
+    """Get localized message"""
+    return MESSAGES[BOT_LANGUAGE][key].format(**kwargs)
+
 # Icecast server configuration - Zeno.fm settings
 SERVER_HOST = "link.zeno.fm" # dont change.
 SERVER_PORT = 80 # dont change
@@ -416,9 +552,28 @@ class SEA(BaseBot):
             else:
                 await self.highrise.send_whisper(user.id, "Invalid command, usage: /bitrate [number]k\nExample: /bitrate 128k")
 
+        if message.startswith("/setlang ") and (user.username == "Atknz" or user.username in ownerz):
+            try:
+                parts = message.split(" ", 1)
+                if len(parts) == 2:
+                    lang_code = parts[1].lower()
+                    global BOT_LANGUAGE
+                    if lang_code == "tr":
+                        BOT_LANGUAGE = "tr"
+                        await self.highrise.chat(get_message("language_changed"))
+                    elif lang_code == "eng":
+                        BOT_LANGUAGE = "eng"
+                        await self.highrise.chat(get_message("language_changed"))
+                    else:
+                        await self.highrise.send_whisper(user.id, "Usage: /setlang tr or /setlang eng")
+                else:
+                    await self.highrise.send_whisper(user.id, "Usage: /setlang tr or /setlang eng")
+            except Exception as e:
+                print(f"Error in /setlang command: {e}")
+
         if message == "/restart" and (user.username == "Atknz" or user.username in ownerz):
             try:
-                await self.highrise.send_whisper(user.id, "Bot is restarting...")
+                await self.highrise.send_whisper(user.id, get_message("bot_restarting"))
                 await self.restart_bot()
             except Exception as e:
                 print("Error in /restart command: ", e)
@@ -468,46 +623,46 @@ class SEA(BaseBot):
                     elif user.username in vip_users:
                         # Maximum 2 songs for VIPs
                         if user_songs_count >= 2:
-                            await self.highrise.send_whisper(user.id, "VIP users can play maximum 2 songs simultaneously. Wait until your current song finishes.")
+                            await self.highrise.send_whisper(user.id, get_message("vip_limit"))
                             return
                     else:
                         # Maximum 1 song for normal users
                         if user_songs_count >= 1:
-                            await self.highrise.send_whisper(user.id, "You can only play 1 song at a time. Wait until your current song finishes.")
+                            await self.highrise.send_whisper(user.id, get_message("user_limit"))
                             return
                     
                     query = message.split(" ", 1)[1]
                     lower_query = query.lower()
                     for item in restrict:
                         if item.lower() in lower_query:
-                            await self.highrise.send_whisper(user.id, "This song is banned. Your ticket has been refunded.")
+                            await self.highrise.send_whisper(user.id, get_message("song_banned"))
                             return
                     if query.startswith("https://"):
                         if "playlist" not in query:
-                            await self.highrise.send_whisper(user.id, "Links are not currently supported, add as song - artist.")
+                            await self.highrise.send_whisper(user.id, get_message("links_not_supported"))
                             return
-                            await self.highrise.send_whisper(user.id, "İsteğiniz işleniyor. Sabırlı olun.")
+                            await self.highrise.send_whisper(user.id, get_message("song_processing"))
                             if user.username in user_ticket:
                                 if user.username not in ownerz and user.username not in vip_users:
                                     await asyncio.sleep(1)
-                                    await self.highrise.send_whisper(user.id, "• Note: Requests cost 1 ticket. Don't waste your tickets. If your requested song is not found, your ticket will be refunded.")
+                                    await self.highrise.send_whisper(user.id, get_message("ticket_cost_note"))
                             await self.add_to_queue(query, user)
                         else:
-                            await self.highrise.send_whisper(user.id, "\n You cannot add playlists. Request one song at a time")
+                            await self.highrise.send_whisper(user.id, get_message("no_playlists"))
                     else:
-                        await self.highrise.send_whisper(user.id, "İsteğiniz işleniyor. Sabırlı olun.")
+                        await self.highrise.send_whisper(user.id, get_message("song_processing"))
                         if user.username in user_ticket and user.username not in ownerz and user.username not in vip_users:
                             await asyncio.sleep(1)
-                            await self.highrise.send_whisper(user.id, "• Note: Requests cost 1 ticket. Don't waste your tickets. If your requested song is not found, your ticket will be refunded.")
+                            await self.highrise.send_whisper(user.id, get_message("ticket_cost_note"))
                         await self.add_to_queue(query, user)
                 except IndexError:
-                    await self.highrise.send_whisper(user.id, "Please specify a song name after /play command.")
+                    await self.highrise.send_whisper(user.id, get_message("specify_song"))
                 except Exception as e:
                     print(f"Error in chat command: {e}")
             else:
-                await self.highrise.send_whisper(user.id, "You don't have enough tickets.")
+                await self.highrise.send_whisper(user.id, get_message("no_tickets"))
                 await asyncio.sleep(3)
-                await self.highrise.send_whisper(user.id, "Type /rlist to see price list.")
+                await self.highrise.send_whisper(user.id, get_message("check_prices"))
 
         if message.startswith("/rlist"):
             try:
