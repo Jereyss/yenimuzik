@@ -724,24 +724,18 @@ class SEA(BaseBot):
                         await self.highrise.send_whisper(user.id, "Queue is empty.")
                         return
 
-                    message_content = ""
                     queue_number = 1
-
+                    # Send each song as a separate message with 0.7 second delay
                     for _, file in enumerate(list(self.req_files)[global_index:], start=global_index):
                         if file['user']:
-                            item = f"{queue_number}. 🎵 {file['title']}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {file['duration']}\n (@{file['user']} requested)\n\n"
+                            item = f"{queue_number}. 🎵 {file['title']}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {file['duration']}\n (@{file['user']} requested)"
                         else:
-                            item = f"{queue_number}. 🎵 {file['title']}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {file['duration']}\n\n"
+                            item = f"{queue_number}. 🎵 {file['title']}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {file['duration']}"
                         
-                        if len(message_content) + len(item) > 255:
-                            await self.highrise.send_whisper(user.id, f"{message_content.strip()}")
-                            message_content = item
-                        else:
-                            message_content += item
+                        await self.highrise.send_whisper(user.id, item)
                         queue_number += 1
-
-                    if message_content:
-                        await self.highrise.send_whisper(user.id, f"{message_content.strip()}")
+                        # Wait 0.7 seconds before sending next message
+                        await asyncio.sleep(0.7)
                 else:
                     await self.highrise.send_whisper(user.id, "Queue is empty.")
             except Exception as e:
