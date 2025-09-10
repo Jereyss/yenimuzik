@@ -13,13 +13,11 @@ class BotDefinition:
         self.api_token = api_token
 
 async def verify_reminder_task(bot_instance):
-    """30 saniyede bir verify mesajı gönder"""
+    """Disabled verify reminder task"""
     while True:
-        await asyncio.sleep(60)
-        try:
-            await bot_instance.highrise.chat("⚠️ Ücretsiz bilet almak için bota özel mesaj atarak /verify yazın! (1 kez için geçerli)")
-        except Exception as e:
-            print(f"Verify mesajı gönderilirken hata: {e}")
+        await asyncio.sleep(3600)  # Sleep for 1 hour (task disabled)
+        # Verify reminder is disabled to prevent spam messages
+        pass
 
 async def main():
     room_id = "685fe9208ab075915779c70e"
