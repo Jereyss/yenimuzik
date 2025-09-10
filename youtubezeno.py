@@ -1043,7 +1043,7 @@ class SEA(BaseBot):
                     else:
                         await self.highrise.chat("This message is already in promo list.")
                 else:
-                    await self.highrise.chat("/promo komutundan sonra bir promosyon mesajı verin.")
+                    await self.highrise.chat("Please provide a promotional message after the /promo command.")
             except Exception as e:
                 print(f"Error in /promo command: {e}")
 
@@ -1057,7 +1057,7 @@ class SEA(BaseBot):
                     else:
                         await self.highrise.chat("This message is not in promo list.")
                 else:
-                    await self.highrise.chat("/promo komutundan sonra bir promosyon mesajı verin.")
+                    await self.highrise.chat("Please provide a promotional message after the /promo command.")
             except Exception as e:
                 print(f"Error in /rpromo command: {e}")
 
@@ -1066,7 +1066,7 @@ class SEA(BaseBot):
                 if user.username == "Atknz" or user.username in ownerz:
                     if promo:
                         promo.clear()
-                        await self.highrise.chat("Promo listesi temizlendi.")
+                        await self.highrise.chat("Promo list cleared.")
                     else:
                         await self.highrise.chat("Promo list is already empty.")
                 else:
