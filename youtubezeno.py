@@ -656,28 +656,32 @@ class SEA(BaseBot):
                         global_index = 0
 
                     if len(self.req_files) == 1 and global_index == 1:
-                        await self.highrise.send_whisper(user.id, "Sıra boş.")
+                        await self.highrise.send_whisper(user.id, "Queue is empty.")
                         return
 
                     message_content = ""
                     queue_number = 1
 
                     for _, file in enumerate(list(self.req_files)[global_index:], start=global_index):
-                        item = f"{queue_number}. {file['title']}\n"
+                        if file['user']:
+                            item = f"{queue_number}. 🎵 {file['title']}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {file['duration']}\n (@{file['user']} requested)\n\n"
+                        else:
+                            item = f"{queue_number}. 🎵 {file['title']}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {file['duration']}\n\n"
+                        
                         if len(message_content) + len(item) > 255:
-                            await self.highrise.send_whisper(user.id, f"\n{message_content.strip()}")
+                            await self.highrise.send_whisper(user.id, f"{message_content.strip()}")
                             message_content = item
                         else:
                             message_content += item
                         queue_number += 1
 
                     if message_content:
-                        await self.highrise.send_whisper(user.id, f"\n{message_content.strip()}")
+                        await self.highrise.send_whisper(user.id, f"{message_content.strip()}")
                 else:
-                    await self.highrise.send_whisper(user.id, "Sıra boş.")
+                    await self.highrise.send_whisper(user.id, "Queue is empty.")
             except Exception as e:
                 print(f"Error in /queue command: {e}")
-                await self.highrise.send_whisper(user.id, "Sıra kontrol edilirken hata.")
+                await self.highrise.send_whisper(user.id, "Error checking queue.")
 
         if message.startswith("/info ") and (user.username in ownerz or user.username == "Atknz"):
             try:
