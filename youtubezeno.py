@@ -1167,11 +1167,11 @@ class SEA(BaseBot):
             for item in wallet.content:
                 if item.type == "gold":
                     gold = item.amount
-                    await self.highrise.send_whisper(user.id, f"Efendim, mevcut bakiyem {gold} altın!")
+                    await self.highrise.send_whisper(user.id, f"Sir, my current balance {gold} Gold!")
                     return
             await self.highrise.send_whisper(f"Hello, {user.username}! I have no gold.")
         else:
-            await self.highrise.send_whisper(user.id, "Bu komuta erişiminiz yok")
+            await self.highrise.send_whisper(user.id, "You do not have access to this command")
 
     async def on_user_join(self, user: User, pos: Position) -> None:
         try:
@@ -1206,33 +1206,33 @@ class SEA(BaseBot):
                 if sender.username in vip_users:
                     await self.highrise.send_whisper(sender.id, "You are already VIP, you don't need tickets.")
                 else:
-                    await self.highrise.send_whisper(sender.id, "Bilet almak için en az 5g bahşiş verin.")
+                    await self.highrise.send_whisper(sender.id, "Tip at least 5g to buy a ticket.")
 
             elif tip.amount == 5 and receiver.username == self.username:
                 user_ticket[sender.username] = user_ticket.get(sender.username, 0) + 1
                 if sender.username in vip_users:
                     await self.highrise.send_whisper(sender.id, "You are already VIP, you don't need tickets.")
                 else:
-                    await self.highrise.chat(f"{sender.username}'ın cüzdanı 5g bahşiş için 2 bilet ile güncellendi.")
-                    await self.highrise.send_whisper(sender.id, f"Cüzdanınızdaki toplam bilet: {user_ticket[sender.username]}")
+                    await self.highrise.chat(f"{sender.username}'s wallet updated with 2 tickets for 5g tip.")
+                    await self.highrise.send_whisper(sender.id, f"Total tickets in your wallet: {user_ticket[sender.username]}")
 
             elif tip.amount == 10 and receiver.username == self.username:
                 user_ticket[sender.username] = user_ticket.get(sender.username, 0) + 3
                 if sender.username in vip_users:
                     await self.highrise.send_whisper(sender.id, "You are already VIP, you don't need tickets.")
                 else:
-                    await self.highrise.chat(f"{sender.username}'ın cüzdanı 10g bahşiş için 3 bilet ile güncellendi.")
-                    await self.highrise.send_whisper(sender.id, f"Cüzdanınızdaki toplam bilet: {user_ticket[sender.username]}")
+                    await self.highrise.chat(f"{sender.username}'s wallet updated with 3 tickets for 10g tip.")
+                    await self.highrise.send_whisper(sender.id, f"Total tickets in your wallet: {user_ticket[sender.username]}")
 
             elif tip.amount == 1000 and receiver.username == self.username:
                 current_date = datetime.now().strftime("%d/%m/%Y")
                 day = datetime.now().strftime("%d")
                 if sender.username in vip_users:
-                    await self.highrise.send_whisper(user.id, "VIP döneminiz uzatıldı. Altın bahşiş için teşekkürler. <3")
+                    await self.highrise.send_whisper(user.id, "Your VIP period has been extended. Thank you for the golden tip. <3")
                     for user_id in msg:
                         message_id = f"1_on_1:{user_id}:{self.bot_id}"
                         try:
-                            await self.highrise.send_message(message_id, f"Kullanıcı @{sender.username} {current_date} tarihinde 1000g bahşiş verdi.")
+                            await self.highrise.send_message(message_id, f"User @{sender.username} {current_date} tipped 1000g on.")
                             await asyncio.sleep(1)
                         except Exception as e:
                             print("Error in sending msg abt tip:", e)
@@ -1240,11 +1240,11 @@ class SEA(BaseBot):
                 else:
                     vip_users.append(sender.username)
                     await self.highrise.send_whisper(user.id, get_message("vip_added"))
-                    await self.highrise.send_whisper(user.id, f"\n*NOT*: VIP'iniz {current_date} tarihinden başladı, gelecek ayın {get_ordinal(day)}'ından önce VIP'inizi yenilediğinizden emin olun.")
+                    await self.highrise.send_whisper(user.id, f"\n*NOTE*: Your VIP {current_date} started from the date of next month {get_ordinal(day)} make sure you renew your VIP first.")
                     for user_id in msg:
                         message_id = f"1_on_1:{user_id}:{self.bot_id}"
                         try:
-                            await self.highrise.send_message(message_id, f"Kullanıcı @{sender.username} {current_date} tarihinde VIP oldu.")
+                            await self.highrise.send_message(message_id, f"User @{sender.username} {current_date} became a VIP on.")
                             await asyncio.sleep(1)
                         except Exception as e:
                             print("Error in sending msg abt tip:", e)
@@ -1252,13 +1252,13 @@ class SEA(BaseBot):
             elif tip.amount % 10 == 0 and tip.amount >= 10 and receiver.username == self.username:
                 tickets = (tip.amount // 10) * 3
                 user_ticket[sender.username] = user_ticket.get(sender.username, 0) + tickets
-                await self.highrise.chat(f"{sender.username}'ın cüzdanı {tip.amount}g bahşiş için {tickets} bilet ile güncellendi.")
-                await self.highrise.send_whisper(sender.id, f"Cüzdanınızdaki toplam bilet: {user_ticket[sender.username]}")
+                await self.highrise.chat(f"{sender.username}'s wallet {tip.amount}g for tip {tickets} updated with ticket.")
+                await self.highrise.send_whisper(sender.id, f"Total tickets in your wallet: {user_ticket[sender.username]}")
             else:
                 pass
         except Exception as e:
             print(e)
-            await self.highrise.send_whisper(sender.id, f"Hata oluştu: {e}. Lütfen @Atknz'yi bilgilendirin")
+            await self.highrise.send_whisper(sender.id, f"An error occurred: {e}. Please notify @Atknz")
 
     async def add_to_queue(self, query, user):
         """Search for a song and add it to the queue using yt-dlp."""
