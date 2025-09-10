@@ -72,7 +72,7 @@ class SEA(BaseBot):
         self.state_file = "bot_state.json"
         self.req_files_dir = "./reqfiles"
         self.fav_dir = "./fav"
-        self.room_id = None  # Room ID'yi saklamak için
+        self.room_id = None  # To store Room ID
         os.makedirs(self.fav_dir, exist_ok=True)
         os.makedirs(self.req_files_dir, exist_ok=True)
         self.load_state()
@@ -388,7 +388,7 @@ class SEA(BaseBot):
         if message.lower() == "no":
             if user.username == "Atknz" or user.username in ownerz:
                 if user.username in self.choices:
-                    await self.highrise.send_whisper(user.id, "İşlem iptal edildi.")
+                    await self.highrise.send_whisper(user.id, "Operation cancelled.")
                     del self.choices[user.username]
 
         if message.lower() == "yes":
@@ -532,7 +532,7 @@ class SEA(BaseBot):
                     if file_info.get('user'):
                         await self.highrise.send_whisper(
                             user.id,
-                            f"🎵 {index + 1}: {now}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {audio_length}\n (@{file_info['user']} tarafından istendi)"
+                            f"🎵 {index + 1}: {now}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {audio_length}\n (requested by @{file_info['user']})"
                         )
                     else:
                         await self.highrise.send_whisper(
@@ -542,7 +542,7 @@ class SEA(BaseBot):
                 else:
                     await self.highrise.send_whisper(user.id, f"Song number {index} not found in queue.")
             except ValueError:
-                await self.highrise.send_whisper(user.id, "Geçersiz indeks formatı. /dump komutundan sonra geçerli bir numara verin.")
+                await self.highrise.send_whisper(user.id, "Invalid index format. Please provide a valid number after /dump command.")
             except Exception as e:
                 print(f"Error in /dump command: {e}")
                 await self.highrise.send_whisper(user.id, "Error occurred while processing request.")
@@ -622,7 +622,7 @@ class SEA(BaseBot):
                             os.remove(self.req_files[adjusted_index]['url'])
                         self.req_files.remove(removed_file)
 
-                        await self.highrise.chat(f"🎵 Sıradan kaldırıldı: {fix_rem}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {rem_length}")
+                        await self.highrise.chat(f"🎵 Removed from queue: {fix_rem}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {rem_length}")
                     else: 
                         await self.highrise.send_whisper(user.id, f"Song number {get_ordinal(index + 1)} not found in queue.") 
                 else:
@@ -634,9 +634,9 @@ class SEA(BaseBot):
                     req_user = self.now[0]['user']
                     fix_rem = removed_file['title']
                     if not (user.username in ownerz or user.username == req_user):
-                        await self.highrise.send_whisper(user.id, "NOT: Sadece istediğiniz şarkıyı geçebilirsiniz.")
+                        await self.highrise.send_whisper(user.id, "NOTE: You can only skip your own requested song.")
                         return
-                    await self.highrise.chat(f"🎵 Geçiliyor {fix_rem}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {rem_length}")
+                    await self.highrise.chat(f"🎵 Skipping {fix_rem}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {rem_length}")
                     await asyncio.sleep(3)
                     self.skip = True
             except Exception as e:
@@ -699,9 +699,9 @@ class SEA(BaseBot):
                 rem = remvip.replace("@", "")
                 if rem in ownerz:
                     ownerz.remove(rem)
-                    await self.highrise.chat(f"{remvip} sahiplerden kaldırıldı.")
+                    await self.highrise.chat(f"{remvip} removed from owners.")
                 else:
-                    await self.highrise.send_whisper(user.id, f"{rem} sahipler arasında değil.")
+                    await self.highrise.send_whisper(user.id, f"{rem} is not among owners.")
             except:
                 pass
 
@@ -711,11 +711,11 @@ class SEA(BaseBot):
                 allowed = vip.replace("@", "")
                 if allowed not in ownerz:
                     ownerz.append(allowed)
-                    await self.highrise.chat(f"{vip} sahiplere eklendi.")
+                    await self.highrise.chat(f"{vip} added to owners.")
                 else:
-                    await self.highrise.chat(f"{vip} zaten sahip.")
+                    await self.highrise.chat(f"{vip} is already an owner.")
             except:
-                await self.highrise.send_whisper(user.id, "Hayır")
+                await self.highrise.send_whisper(user.id, "No")
 
         if message.startswith("/vipz") and (user.username in ownerz or user.username == "Atknz"):
             try:
@@ -731,10 +731,10 @@ class SEA(BaseBot):
                     if message_content:
                         await self.highrise.send_whisper(user.id, f"\n{message_content.strip()}")
                 else:
-                    await self.highrise.send_whisper(user.id, "VIP listesi boş.")
+                    await self.highrise.send_whisper(user.id, "VIP list is empty.")
             except Exception as e:
                 print(f"Error in /vipz command: {e}")
-                await self.highrise.send_whisper(user.id, "Sıra kontrol edilirken hata.")
+                await self.highrise.send_whisper(user.id, "Error while checking queue.")
 
         if message.startswith("/remv ") and (user.username in ownerz or user.username == "Atknz"):
             try:
@@ -743,17 +743,17 @@ class SEA(BaseBot):
                 rem = remvip.replace("@", "")
                 if rem in vip_users:
                     vip_users.remove(rem)
-                    await self.highrise.chat(f"{remvip} VIP'ten kaldırıldı.")
+                    await self.highrise.chat(f"{remvip} removed from VIP.")
                     for user_id in msg:
                         message_id = f"1_on_1:{user_id}:{self.bot_id}"
                         try:
-                            await self.highrise.send_message(message_id, f"Kullanıcı {remvip} {current_date} tarihinde VIP'ten kaldırıldı, @{user.username} tarafından kaldırıldı")
+                            await self.highrise.send_message(message_id, f"User {remvip} removed from VIP on {current_date}, removed by @{user.username}")
                             await asyncio.sleep(1)
                         except Exception as e:
-                            await self.highrise.chat(f"{user_id}'ye mesaj gönderilemedi: {e}")
+                            await self.highrise.chat(f"Could not send message to {user_id}: {e}")
                             print("Error in sending msg in /addv:", e)
                 else:
-                    await self.highrise.send_whisper(user.id, f"{rem} VIP değil.")
+                    await self.highrise.send_whisper(user.id, f"{rem} is not VIP.")
             except:
                 pass
 
@@ -764,19 +764,19 @@ class SEA(BaseBot):
                 allowed = vip.replace("@", "")
                 if allowed not in vip_users:
                     vip_users.append(allowed)
-                    await self.highrise.chat(f"{vip} VIP'e eklendi.")
+                    await self.highrise.chat(f"{vip} added to VIP.")
                     for user_id in msg:
                         message_id = f"1_on_1:{user_id}:{self.bot_id}"
                         try:
-                            await self.highrise.send_message(message_id, f"Kullanıcı {vip} {current_date} tarihinde VIP oldu, @{user.username} tarafından eklendi")
+                            await self.highrise.send_message(message_id, f"User {vip} became VIP on {current_date}, added by @{user.username}")
                             await asyncio.sleep(1)
                         except Exception as e:
-                            await self.highrise.chat(f"{user_id}'ye mesaj gönderilemedi: {e}")
+                            await self.highrise.chat(f"Could not send message to {user_id}: {e}")
                             print("Error in sending msg in /addv:", e)
                 else:
-                    await self.highrise.chat(f"{vip} zaten VIP.")
+                    await self.highrise.chat(f"{vip} is already VIP.")
             except:
-                await self.highrise.send_whisper(user.id, "Hayır")
+                await self.highrise.send_whisper(user.id, "No")
 
         if message.startswith("/transfer"):
             try:
@@ -784,14 +784,14 @@ class SEA(BaseBot):
                 username = username.strip("@")
                 value = int(value)
                 if not value >= 6:
-                    await self.highrise.send_whisper(user.id, "NOT: En az 6 bilet transfer etmeniz gerekiyor.")
+                    await self.highrise.send_whisper(user.id, "NOTE: You need to transfer at least 6 tickets.")
                 else:
                     if user_ticket[user.username] >= value:
                         user_ticket[username] += value
                         user_ticket[user.username] -= value
-                        await self.highrise.chat(f"{username}'a {value} bilet gönderildi.")
+                        await self.highrise.chat(f"{value} tickets sent to {username}.")
                     else:
-                        await self.highrise.send_whisper(user.id, "Yeterli biletiniz yok")
+                        await self.highrise.send_whisper(user.id, "You don't have enough tickets")
             except Exception as e:
                 print(f"An error occurred: {e}")
 
@@ -822,11 +822,11 @@ class SEA(BaseBot):
                             os.remove(file_path)
                             playlist.pop(index)
 
-                            await self.highrise.chat(f"🎵 Sıradan kaldırıldı: {fix_rem}\n🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {rem_length}")
+                            await self.highrise.chat(f"🎵 Removed from queue: {fix_rem}\n🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• {rem_length}")
                     else:
-                        await self.highrise.send_whisper(user.id, f"Sırada {get_ordinal(parts[1])} konumunda şarkı bulunamadı.")
+                        await self.highrise.send_whisper(user.id, f"Song not found at position {get_ordinal(parts[1])} in queue.")
                 else:
-                    await self.highrise.send_whisper(user.id, "Kaldırmak için geçerli bir şarkı numarası verin.")
+                    await self.highrise.send_whisper(user.id, "Please provide a valid song number to remove.")
             except Exception as e:
                 print(f"Error in /rfav command: {e}")
                 await self.highrise.send_whisper(user.id, f"Hata: {e}")
@@ -845,20 +845,20 @@ class SEA(BaseBot):
                     if message_content:
                         await self.highrise.send_whisper(user.id, f"\n{message_content.strip()}")
                 else:
-                    await self.highrise.send_whisper(user.id, "Sıra boş.")
+                    await self.highrise.send_whisper(user.id, "Queue is empty.")
             except Exception as e:
                 print(f"Error in /flist command: {e}")
-                await self.highrise.send_whisper(user.id, "Sıra kontrol edilirken hata.")
+                await self.highrise.send_whisper(user.id, "Error while checking queue.")
 
         if message.startswith("/fav") and (user.username in ownerz or user.username == "Atknz"):
             try:
                 if self.now:
                     fav = self.now[0]
                     if any(item['url'] == fav['url'] for item in playlist):
-                        await self.highrise.chat(f"{fav['title']} zaten favori çalma listesinde.")
+                        await self.highrise.chat(f"{fav['title']} is already in favorite playlist.")
                         return
                     if fav['url'] in AUDIO_FILES:
-                        await self.highrise.send_whisper(user.id, "• Not: Sadece istenen şarkıları favorilere ekleyebilirsiniz.")
+                        await self.highrise.send_whisper(user.id, "• Note: You can only add requested songs to favorites.")
                     else:
                         permanent_file = f"./fav/{fav['title']}.mp3"
                         try:
@@ -868,9 +868,9 @@ class SEA(BaseBot):
                             return
                         fav['url'] = permanent_file
                         playlist.append(fav)
-                        await self.highrise.chat(f"{fav['title']} favori çalma listesine eklendi.")
+                        await self.highrise.chat(f"{fav['title']} added to favorite playlist.")
                 else:
-                    await self.highrise.chat("Şu anda hiçbir şey çalmıyor.")
+                    await self.highrise.chat("Nothing is currently playing.")
             except Exception as e:
                 print("Error in /fav command:", e)
 
@@ -884,19 +884,19 @@ class SEA(BaseBot):
                             except:
                                 print("Error in /cfav for loop:", e)
                     playlist.clear()
-                    await self.highrise.chat("Favori çalma listesi temizlendi.")
+                    await self.highrise.chat("Favorite playlist cleared.")
                 else:
-                    await self.highrise.chat("Favori çalma listesi zaten boş.")
+                    await self.highrise.chat("Favorite playlist is already empty.")
             else:
-                await self.highrise.send_whisper(user.id, "Bu komuta erişiminiz yok.")
+                await self.highrise.send_whisper(user.id, "You don't have access to this command.")
 
         if message.startswith("/cmsg") and (user.username in ownerz or user.username == "Atknz"):
             try:
                 if msg:
                     msg.clear()
-                    await self.highrise.chat("Mesaj listesi temizlendi.")
+                    await self.highrise.chat("Message list cleared.")
                 else:
-                    await self.highrise.chat("Mesaj listesi zaten boş.")
+                    await self.highrise.chat("Message list is already empty.")
             except:
                 print("Error in /cmsg:", e)
 
@@ -911,13 +911,13 @@ class SEA(BaseBot):
                         user_id = user[0].id
                         break
                 if user_id is None:
-                    await self.highrise.send_whisper(user.id,"Kullanıcı odada bulunamadı.")
+                    await self.highrise.send_whisper(user.id,"User not found in room.")
                     return
                 if user_id in msg:
                     msg.remove(user_id)
-                    await self.highrise.chat(f"Kullanıcı @{username} mesaj listesinden kaldırıldı.")
+                    await self.highrise.chat(f"User @{username} removed from message list.")
                 else:
-                    await self.highrise.chat("Kullanıcı listede değil.")
+                    await self.highrise.chat("User is not in the list.")
             except Exception as e:
                     print("Error in /rmsg:", e)
 
@@ -932,13 +932,13 @@ class SEA(BaseBot):
                         user_id = user[0].id
                         break
                 if user_id is None:
-                    await self.highrise.send_whisper(user.id,"Kullanıcı odada bulunamadı.")
+                    await self.highrise.send_whisper(user.id,"User not found in room.")
                     return
                 if user_id not in msg:
                     msg.append(user_id)
-                    await self.highrise.chat(f"Kullanıcı @{username} mesaj listesine eklendi.")
+                    await self.highrise.chat(f"User @{username} added to message list.")
                 else:
-                    await self.highrise.chat("Kullanıcı zaten listede.")
+                    await self.highrise.chat("User is already in the list.")
             except Exception as e:
                     print("Error in /msg:", e)
 
@@ -947,9 +947,9 @@ class SEA(BaseBot):
                 res = message.split(" ", 1)[1]
                 if not res in restrict:
                     restrict.append(res)
-                    await self.highrise.chat("Bu şarkı yasaklı şarkılara eklendi.")
+                    await self.highrise.chat("This song has been added to banned songs.")
                 else:
-                    await self.highrise.chat("Bu şarkı zaten yasaklı.")
+                    await self.highrise.chat("This song is already banned.")
             except Exception as e:
                 print(f"Error in /restrict command: {e}")
 
@@ -958,9 +958,9 @@ class SEA(BaseBot):
                 res = message.split(" ", 1)[1]
                 if res in restrict:
                     restrict.remove(res)
-                    await self.highrise.chat("Bu şarkı yasaklı şarkılar listesinden kaldırıldı.")
+                    await self.highrise.chat("This song has been removed from the banned songs list.")
                 else:
-                    await self.highrise.chat("Bu şarkı yasaklı değil.")
+                    await self.highrise.chat("This song is not banned.")
             except Exception as e:
                 print(f"Error in /unrestrict command: {e}")
 
@@ -970,9 +970,9 @@ class SEA(BaseBot):
                 if prom:
                     if prom not in promo:
                         promo.append(prom)
-                        await self.highrise.chat("Bu mesaj promo listesine eklendi.")
+                        await self.highrise.chat("This message has been added to promo list.")
                     else:
-                        await self.highrise.chat("Bu mesaj zaten promo listesinde.")
+                        await self.highrise.chat("This message is already in promo list.")
                 else:
                     await self.highrise.chat("/promo komutundan sonra bir promosyon mesajı verin.")
             except Exception as e:
@@ -984,9 +984,9 @@ class SEA(BaseBot):
                 if prom:
                     if prom in promo:
                         promo.remove(prom)
-                        await self.highrise.chat("Bu mesaj promo listesinden kaldırıldı.")
+                        await self.highrise.chat("This message has been removed from the promo list.")
                     else:
-                        await self.highrise.chat("Bu mesaj promo listesinde değil.")
+                        await self.highrise.chat("This message is not in promo list.")
                 else:
                     await self.highrise.chat("/promo komutundan sonra bir promosyon mesajı verin.")
             except Exception as e:
@@ -999,7 +999,7 @@ class SEA(BaseBot):
                         promo.clear()
                         await self.highrise.chat("Promo listesi temizlendi.")
                     else:
-                        await self.highrise.chat("Promo listesi zaten boş.")
+                        await self.highrise.chat("Promo list is already empty.")
                 else:
                     pass
             except:
@@ -1012,7 +1012,7 @@ class SEA(BaseBot):
                 active = {key: value for key, value in user_ticket.items() if value > 0 and value != 3}
                 total_empty = len(empty)
                 total_active = len(active)
-                await self.highrise.chat(f"\nToplam {total} kullanıcı var, {total_active} aktif hesap, sadece {total_empty} kullanıcının bakiyesi 0.")
+                await self.highrise.chat(f"\nTotal {total} users, {total_active} active accounts, only {total_empty} users have 0 balance.")
             except Exception as e:
                 print("Error in /accs:", e)
 
@@ -1030,7 +1030,7 @@ class SEA(BaseBot):
                 bot_wallet = await self.highrise.get_wallet()
                 bot_amount = bot_wallet.content[0].amount
                 if bot_amount <= amount:
-                    await self.highrise.send_whisper(user.id, "Efendim, yeterli bakiyem yok.")
+                    await self.highrise.send_whisper(user.id, "Sir, I don't have enough balance.")
                     return
                 """Possible values are: "gold_bar_1",
             "gold_bar_5", "gold_bar_10", "gold_bar_50", 
@@ -1064,7 +1064,7 @@ class SEA(BaseBot):
                             tip.append(bars_dictionary[bar])
                             total = bar+fees_dictionary[bar]
                 if total > bot_amount:
-                    await self.highrise.send_whisper(user.id, "Efendim, yeterli fonlarım yok.")
+                    await self.highrise.send_whisper(user.id, "Sir, I don't have enough funds.")
                     return
                 tip_string = ",".join(tip)
                 await self.highrise.tip_user(user.id, tip_string)
@@ -1106,7 +1106,7 @@ class SEA(BaseBot):
                     gold = item.amount
                     await self.highrise.send_whisper(user.id, f"Efendim, mevcut bakiyem {gold} altın!")
                     return
-            await self.highrise.send_whisper(f"Merhaba, {user.username}! Hiç altınım yok.")
+            await self.highrise.send_whisper(f"Hello, {user.username}! I have no gold.")
         else:
             await self.highrise.send_whisper(user.id, "Bu komuta erişiminiz yok")
 
@@ -1119,15 +1119,15 @@ class SEA(BaseBot):
                 one_month_ago = datetime.now(joined_at.tzinfo) - timedelta(days=30)
                 if joined_at <= one_month_ago:
                     if not user.username in user_ticket:
-                        await self.highrise.send_whisper(user.id, "Odaya hoş geldiniz <3.\nÜcretsiz bilet almak için bu bota /verify yazın. Her şarkı isteği 1 bilet maliyetindedir.")
+                        await self.highrise.send_whisper(user.id, "Welcome to the room <3.\nType /verify to this bot to get free tickets. Each song request costs 1 ticket.")
                         await asyncio.sleep(2)
-                        await self.highrise.send_whisper(user.id, "Şarkı istemek için /play 'şarkı' yazın. Tüm komutlar için /help yazın.")
+                        await self.highrise.send_whisper(user.id, "Type /play 'song' to request a song. Type /help for all commands.")
                         await asyncio.sleep(1)
-                        await self.highrise.send_whisper(user.id, "Bot arıza yaparsa @Atknz'ye mesaj atın")
+                        await self.highrise.send_whisper(user.id, "If the bot malfunctions, message @Atknz")
                     else:
                         await self.highrise.send_whisper(user.id, "Odaya tekrar hoş geldiniz <3.\nBilet bilginizi öğrenmek için /wallet yazın. Tüm komutlar için /help yazın.")
                         await asyncio.sleep(2)
-                        await self.highrise.send_whisper(user.id, "Bot arıza yaparsa @Atknz'ye mesaj atın")
+                        await self.highrise.send_whisper(user.id, "If the bot malfunctions, message @Atknz")
                 else:
                     await self.highrise.send_whisper(user.id, "Odaya hoş geldiniz <3.\nBu bir müzik botudur. Fiyat listesi için /rlist yazın, her şarkı isteği 1 bilet maliyetindedir. Bilet bilginizi öğrenmek için /wallet yazın. Şarkı istemek için /play yazın.")
                     await asyncio.sleep(2)
@@ -1141,14 +1141,14 @@ class SEA(BaseBot):
         try:
             if tip.amount == 1 and receiver.username == self.username:
                 if sender.username in vip_users:
-                    await self.highrise.send_whisper(sender.id, "Zaten VIP'siniz, bilete ihtiyacınız yok.")
+                    await self.highrise.send_whisper(sender.id, "You are already VIP, you don't need tickets.")
                 else:
                     await self.highrise.send_whisper(sender.id, "Bilet almak için en az 5g bahşiş verin.")
 
             elif tip.amount == 5 and receiver.username == self.username:
                 user_ticket[sender.username] = user_ticket.get(sender.username, 0) + 1
                 if sender.username in vip_users:
-                    await self.highrise.send_whisper(sender.id, "Zaten VIP'siniz, bilete ihtiyacınız yok.")
+                    await self.highrise.send_whisper(sender.id, "You are already VIP, you don't need tickets.")
                 else:
                     await self.highrise.chat(f"{sender.username}'ın cüzdanı 5g bahşiş için 2 bilet ile güncellendi.")
                     await self.highrise.send_whisper(sender.id, f"Cüzdanınızdaki toplam bilet: {user_ticket[sender.username]}")
@@ -1156,7 +1156,7 @@ class SEA(BaseBot):
             elif tip.amount == 10 and receiver.username == self.username:
                 user_ticket[sender.username] = user_ticket.get(sender.username, 0) + 3
                 if sender.username in vip_users:
-                    await self.highrise.send_whisper(sender.id, "Zaten VIP'siniz, bilete ihtiyacınız yok.")
+                    await self.highrise.send_whisper(sender.id, "You are already VIP, you don't need tickets.")
                 else:
                     await self.highrise.chat(f"{sender.username}'ın cüzdanı 10g bahşiş için 3 bilet ile güncellendi.")
                     await self.highrise.send_whisper(sender.id, f"Cüzdanınızdaki toplam bilet: {user_ticket[sender.username]}")
