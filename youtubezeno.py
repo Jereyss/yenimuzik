@@ -1331,7 +1331,7 @@ class SEA(BaseBot):
 
                 else:
                     vip_users.append(sender.username)
-                    await self.highrise.send_whisper(user.id, "VIP kullanıcılara eklendiniz. Hata yaşarsanız @Atknz'ye mesaj atın. Keyfini çıkarın <3")
+                    await self.highrise.send_whisper(user.id, get_message("vip_added"))
                     await self.highrise.send_whisper(user.id, f"\n*NOT*: VIP'iniz {current_date} tarihinden başladı, gelecek ayın {get_ordinal(day)}'ından önce VIP'inizi yenilediğinizden emin olun.")
                     for user_id in msg:
                         message_id = f"1_on_1:{user_id}:{self.bot_id}"
@@ -1363,17 +1363,17 @@ class SEA(BaseBot):
                 'duration': track_duration,
                 'user': user.username,
             })
-            await self.highrise.chat(f'🎵 {track["title"]}\n 🎵 ▷ •ı||ıı|ıı|ı||ı|ıı||ı• ({track_duration}) sıraya eklendi\n (@{user.username} tarafından istendi)')
+            await self.highrise.chat(get_message("song_added", title=track["title"], duration=track_duration, user=user.username))
             if user.username in user_ticket:
                 if user.username not in ownerz:
                     if user.username not in vip_users:
                         user_ticket[user.username] -= 1
-                        await self.highrise.send_whisper(user.id, f"Cüzdanınızda kalan bilet: {user_ticket[user.username]}")
+                        await self.highrise.send_whisper(user.id, get_message("remaining_tickets", tickets=user_ticket[user.username]))
         else:
             await asyncio.sleep(2)
-            await self.highrise.send_whisper(user.id, "Şarkınız eklenemedi. Zaten sırada olan şarkıyı tekrar istememek ve 8 dakikadan uzun şarkı istememek için dikkat edin.")
+            await self.highrise.send_whisper(user.id, get_message("song_failed"))
             await asyncio.sleep(2)
-            await self.highrise.send_whisper(user.id, "Biletiniz cüzdanınıza iade edildi. Tekrar deneyin.")
+            await self.highrise.send_whisper(user.id, get_message("ticket_refunded"))
 
     async def download_chunk(self, session, url, start, end, queue):
         headers = {'Range': f'bytes={start}-{end}'}
@@ -1479,7 +1479,7 @@ class SEA(BaseBot):
                 }
                 for items in self.req_files:
                     if items["title"] == info['title']:
-                        await self.highrise.send_whisper(user.id, "Şarkı zaten sırada.")
+                        await self.highrise.send_whisper(user.id, get_message("song_already_queued"))
                         return None, None, None
 
                 attempts = 0
