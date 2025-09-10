@@ -1,11 +1,16 @@
 # Bot dependencies for Render deployment
-highrise-bot-sdk>=23.3.4
-aiohttp>=3.9.3
-aiofiles>=24.1.0
-yt-dlp>=2024.8.0
-mutagen>=1.47.0
-openai>=1.0.0
-replicate>=0.15.0
+# Core bot functionality
+highrise-bot-sdk==23.3.4
 
-# Python standard library extensions (if needed)
-# Most imports like os, json, sys, asyncio, threading, etc. are built-in
+# Audio and media processing
+aiohttp==3.9.5
+aiofiles==24.1.0
+yt-dlp==2024.8.6
+mutagen==1.47.0
+
+# AI services - using compatible versions
+openai==0.28.1
+replicate==0.15.0
+
+# Dependency compatibility fixes
+typing_extensions==3.10.0.2
