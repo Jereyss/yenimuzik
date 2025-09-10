@@ -126,6 +126,7 @@ class SEA(BaseBot):
         self.message_task = None
         self.notification_task = None
         self.promo_task = None
+        self.dance_loop_task = None
         self.username = None
         self.owner_id = None
         self.owner = None
@@ -146,6 +147,18 @@ class SEA(BaseBot):
         self.load_state()
 
         self.dance_loop_running = False
+
+    async def cleanup_tasks(self):
+        """Clean up running async tasks"""
+        tasks = [self.message_task, self.notification_task, self.promo_task, self.dance_loop_task]
+        for task in tasks:
+            if task and not task.done():
+                try:
+                    task.cancel()
+                    await asyncio.gather(task, return_exceptions=True)
+                except Exception as e:
+                    print(f"Error cleaning up task: {e}")
+                    pass
 
     def count_user_songs_in_queue(self, username):
         """Calculate user's song count in queue"""
@@ -215,51 +228,46 @@ class SEA(BaseBot):
 
     async def on_start(self, session_metadata: SessionMetadata):
         try:
+            # Clean up any existing tasks first
+            await self.cleanup_tasks()
+            
             self.username = await self.get_username(session_metadata.user_id)
             self.bot_id = session_metadata.user_id
             self.owner_id = session_metadata.room_info.owner_id
             self.owner = await self.get_username(self.owner_id)
         except Exception as e:
             print("Error in get username, and bot id on start:", e)
+            return
 
-        if not (self.owner is None):
-            if self.owner not in ownerz:
-                ownerz.append(self.owner)
+        try:
+            if not (self.owner is None):
+                if self.owner not in ownerz:
+                    ownerz.append(self.owner)
+
+            if not (self.owner_id is None):
+                if self.owner_id not in msg:
+                    msg.append(self.owner_id)
+
+            # Bot positioning
+            if bot_location:
+                await self.highrise.teleport(session_metadata.user_id, Position(**bot_location))
             else:
-                pass
-        else:
-            pass
-
-        if not (self.owner_id is None):
-            if self.owner_id not in msg:
-                msg.append(self.owner_id)
-            else:
-                pass
-        else:
-            pass
-
-        if bot_location:
-            await self.highrise.teleport(session_metadata.user_id, Position(**bot_location))
-            # تشغيل حلقة الرقص
-            self.dance_loop_running = True
-            self.dance_loop_task = asyncio.create_task(self._dance_loop())
-        else:
-            await self.highrise.teleport(session_metadata.user_id, Position(15.5, 0.25, 2.5, 'FrontRight'))
-            # تشغيل حلقة الرقص
+                await self.highrise.teleport(session_metadata.user_id, Position(15.5, 0.25, 2.5, 'FrontRight'))
+            
+            # Start dance loop
             self.dance_loop_running = True
             self.dance_loop_task = asyncio.create_task(self._dance_loop())
 
-        if self.notification_task is None or self.notification_task.done():
+            # Start background tasks with error handling
             self.notification_task = asyncio.create_task(self.notification())
-        else:
-            pass
-
-        if self.message_task is None or self.message_task.done():
             self.message_task = asyncio.create_task(self.print_messages())
-
-        if self.promo_task is None or self.promo_task.done():
             self.promo_task = asyncio.create_task(self.promo())
-        print(f"{self.username} is alive.")
+            
+            print(f"{self.username} is alive.")
+            
+        except Exception as e:
+            print(f"Error in on_start: {e}")
+            await self.cleanup_tasks()
 
     async def on_message(self, user_id: str, conversation_id: str, is_new_conversation: bool) -> None:
         try:
