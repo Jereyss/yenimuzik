@@ -513,7 +513,7 @@ class SEA(BaseBot):
             try:
                 await self.highrise.send_whisper(user.id, f"\n • Note: Tip @{self.username} in the room,\n • 1 ticket costs 5g\n • 3 tickets cost 10g\n • 30 tickets cost 100g, etc.")
                 await asyncio.sleep(2)
-                await self.highrise.send_whisper(user.id, f"\n*NOT*: @{self.username}'a odada 1k bahşiş vererek VIP olabilirsiniz.")
+                await self.highrise.send_whisper(user.id, f"\n*NOTE*: You can become VIP by tipping 1k to @{self.username} in the room.")
                 await asyncio.sleep(2)
                 await self.highrise.send_whisper(user.id, "VIP users can request songs without tickets. VIP users must renew their VIP membership every month.")
             except Exception as e:
@@ -1125,13 +1125,13 @@ class SEA(BaseBot):
                         await asyncio.sleep(1)
                         await self.highrise.send_whisper(user.id, "If the bot malfunctions, message @Atknz")
                     else:
-                        await self.highrise.send_whisper(user.id, "Odaya tekrar hoş geldiniz <3.\nBilet bilginizi öğrenmek için /wallet yazın. Tüm komutlar için /help yazın.")
+                        await self.highrise.send_whisper(user.id, "Welcome back to the room <3.\nType /wallet to check your ticket info. Type /help for all commands.")
                         await asyncio.sleep(2)
                         await self.highrise.send_whisper(user.id, "If the bot malfunctions, message @Atknz")
                 else:
-                    await self.highrise.send_whisper(user.id, "Odaya hoş geldiniz <3.\nBu bir müzik botudur. Fiyat listesi için /rlist yazın, her şarkı isteği 1 bilet maliyetindedir. Bilet bilginizi öğrenmek için /wallet yazın. Şarkı istemek için /play yazın.")
+                    await self.highrise.send_whisper(user.id, "Welcome to the room <3.\nThis is a music bot. Type /rlist for price list, each song request costs 1 ticket. Type /wallet to check your ticket info. Type /play to request a song.")
                     await asyncio.sleep(2)
-                    await self.highrise.send_whisper(user.id, "Bot arıza yaparsa @Atknz'ye mesaj atın")
+                    await self.highrise.send_whisper(user.id, "If the bot malfunctions, message @Atknz")
             else:
                 pass
         except:
